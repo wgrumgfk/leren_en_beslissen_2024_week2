@@ -3,7 +3,7 @@ import os
 import matplotlib.pyplot as plt
 from statistics import mean
 
-print('aanpassing')
+print('aanpassing voor deze fime')
 
 cwd = os.getcwd()
 csv_path = "/home/bardha/Leren Beslissen/okeanos.csv"
