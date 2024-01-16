@@ -92,9 +92,12 @@ if __name__ == "__main__":
 
     #TODO 
     #Add column with mean interval 500_split
+    # interval_nr is 100 percent filled in!
+    # If next interval_nr == 1/'avg'/'':
+    #     calculate mean of previous intervals
+    #     fill in the mean for previous intervals in df.mean_500_split_sec
     
 
     #print(non_empty_df['two_k_watt'])
-    print('  Exported processed dataframe with new columns to okeanos_processed.csv')
+    print('exported processed dataframe with new columns to okeanos_processed.csv')
     non_empty_df.to_csv('okeanos_processed.csv')
-
