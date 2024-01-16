@@ -208,8 +208,13 @@ plt.title("2k times per group")
 df.loc[:, 'wattage']= (
     seconds_to_wattage(df, '500_split')
 )
+
+# divide the 2k time so that it becomes a 500-split
+df['500_split_2k']= df['2k tijd'].apply(entry_to_seconds) / 4
+
+
 df.loc[:, '2k_wattage'] = (
-    seconds_to_wattage(df, '2k tijd')
+    2.8 / df['500_split_2k'] ** 3
 )
 
 df = average_split_per_person(df)
@@ -251,7 +256,7 @@ plt.title('Correlation between 500m Split Wattage and 2k Wattage (Men)')
 plt.xlabel('500m Split Wattage')
 plt.ylabel('2k Wattage')
 plt.grid(True)
-# plt.show()
+plt.show()
 
 # Correlation information for men
 men_correlation = men_df['wattage'].corr(men_df['2k_wattage'])
@@ -276,7 +281,7 @@ plt.title('Correlation between 500m Split Wattage and 2k Wattage (Women)')
 plt.xlabel('500m Split Wattage')
 plt.ylabel('2k Wattage')
 plt.grid(True)
-# plt.show()
+plt.show()
 
 # Correlation information for women with threshold
 women_correlation = filtered_women_df['wattage'].corr(filtered_women_df['2k_wattage'])
@@ -286,7 +291,7 @@ print(f'Correlation coefficient for women (above threshold): {women_correlation}
 threshold = 0.001
 
 # Filter the DataFrame for men
-men_df = df[(df['geslacht'] == 'M') & (df['wattage'] > threshold) & (df['2k_wattage'] > threshold)]
+# men_df = df[(df['geslacht'] == 'M') & (df['wattage'] > threshold) & (df['2k_wattage'] > threshold)]
 
 # Scatter plot for men
 plt.figure(figsize=(10, 6))
@@ -296,7 +301,7 @@ plt.xlabel('500m Split Wattage')
 plt.ylabel('2k Wattage')
 plt.legend(title='Experience')
 plt.grid(True)
-# plt.show()
+plt.show()
 
 # Correlation information for men
 men_correlation = men_df.groupby('ervaring')['wattage'].corr(men_df['2k_wattage'])
@@ -304,7 +309,7 @@ print(f'Correlation coefficient for men:')
 print(men_correlation)
 
 # Filter the DataFrame for women
-women_df = df[(df['geslacht'] == 'V') & (df['wattage'] >  threshold) & (df['2k_wattage'] > threshold)]
+# women_df = df[(df['geslacht'] == 'V') & (df['wattage'] >  threshold) & (df['2k_wattage'] > threshold)]
 
 # Scatter plot for women
 plt.figure(figsize=(10, 6))
@@ -314,7 +319,7 @@ plt.xlabel('500m Split Wattage')
 plt.ylabel('2k Wattage')
 plt.legend(title='Experience')
 plt.grid(True)
-# plt.show()
+plt.show()
 
 # Correlation information for women
 women_correlation = women_df.groupby('ervaring')['wattage'].corr(women_df['2k_wattage'])
@@ -325,7 +330,7 @@ print(women_correlation)
 threshold = 0.001
 
 # Filter the DataFrame for men
-men_df = df[(df['geslacht'] == 'M') & (df['wattage'] < threshold) & (df['2k_wattage'] < threshold)]
+# men_df = df[(df['geslacht'] == 'M') & (df['wattage'] < threshold) & (df['2k_wattage'] < threshold)]
 
 # Scatter plot for men
 plt.figure(figsize=(10, 6))
@@ -335,7 +340,7 @@ plt.xlabel('500m Split Wattage')
 plt.ylabel('2k Wattage')
 plt.legend(title='Gewichtsklasse')
 plt.grid(True)
-# plt.show()
+plt.show()
 
 # Correlation information for men
 men_correlation = men_df.groupby('gewichtsklasse')['wattage'].corr(men_df['2k_wattage'])
@@ -343,7 +348,7 @@ print(f'Correlation coefficient for men:')
 print(men_correlation)
 
 # Filter the DataFrame for women
-women_df = df[(df['geslacht'] == 'V') & (df['wattage'] <  threshold) & (df['2k_wattage'] < threshold)]
+# women_df = df[(df['geslacht'] == 'V') & (df['wattage'] <  threshold) & (df['2k_wattage'] < threshold)]
 
 # Scatter plot for women
 plt.figure(figsize=(10, 6))
@@ -353,7 +358,7 @@ plt.xlabel('500m Split Wattage')
 plt.ylabel('2k Wattage')
 plt.legend(title='gewichtsklasse')
 plt.grid(True)
-# plt.show()
+plt.show()
 
 # Correlation information for women
 women_correlation = women_df.groupby('gewichtsklasse')['wattage'].corr(women_df['2k_wattage'])
