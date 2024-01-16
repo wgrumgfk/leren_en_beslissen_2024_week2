@@ -228,17 +228,15 @@ filtered_df = df[(df['wattage'] < threshold) & (df['2k_wattage'] < threshold)]
 
 # Scatter plot
 plt.figure(figsize=(10, 6))
-sns.scatterplot(x='wattage', y='2k_wattage', data=filtered_df)
+sns.regplot(x = "wattage", y = "2k_wattage", data = filtered_df)
+# sns.scatterplot(x='wattage', y='2k_wattage', data=filtered_df)
 plt.title('Correlation between 500m Split Wattage and 2k Wattage (Under Threshold)')
 plt.xlabel('500m Split Wattage')
 plt.ylabel('2k Wattage')
 
-# Add the y=x line
-# plt.plot([0, 0.001], [0, 0.001], color='red', linestyle='--', linewidth=2, label='y=x')
-
 plt.legend()
 plt.grid(True)
-# plt.show()
+plt.show()
 
 # Correlation information for the filtered data
 correlation = filtered_df['wattage'].corr(filtered_df['2k_wattage'])
@@ -251,7 +249,8 @@ men_df = men_df.drop_duplicates(subset='naam', keep='first')
 
 # Scatter plot for men
 plt.figure(figsize=(10, 6))
-sns.scatterplot(x='wattage', y='2k_wattage', data=men_df)
+sns.regplot(x = "wattage", y = "2k_wattage", data = men_df)
+# sns.scatterplot(x='wattage', y='2k_wattage', data=men_df)
 plt.title('Correlation between 500m Split Wattage and 2k Wattage (Men)')
 plt.xlabel('500m Split Wattage')
 plt.ylabel('2k Wattage')
@@ -276,7 +275,8 @@ filtered_women_df = women_df[(women_df['wattage'] < threshold) & (women_df['2k_w
 
 # Scatter plot for women
 plt.figure(figsize=(10, 6))
-sns.scatterplot(x='wattage', y='2k_wattage', data=filtered_women_df)
+sns.regplot(x = "wattage", y = "2k_wattage", data = filtered_women_df)
+# sns.scatterplot(x='wattage', y='2k_wattage', data=filtered_women_df)
 plt.title('Correlation between 500m Split Wattage and 2k Wattage (Women)')
 plt.xlabel('500m Split Wattage')
 plt.ylabel('2k Wattage')
@@ -290,12 +290,10 @@ print(f'Correlation coefficient for women (above threshold): {women_correlation}
 # Set the threshold
 threshold = 0.001
 
-# Filter the DataFrame for men
-# men_df = df[(df['geslacht'] == 'M') & (df['wattage'] > threshold) & (df['2k_wattage'] > threshold)]
-
 # Scatter plot for men
 plt.figure(figsize=(10, 6))
-sns.scatterplot(x='wattage', y='2k_wattage', hue='ervaring', data=men_df)
+sns.regplot(x = "wattage", y = "2k_wattage", hue='ervaring', data = men_df)
+# sns.scatterplot(x='wattage', y='2k_wattage', hue='ervaring', data=men_df)
 plt.title('Correlation between 500m Split Wattage and 2k Wattage (Men)')
 plt.xlabel('500m Split Wattage')
 plt.ylabel('2k Wattage')
@@ -308,12 +306,10 @@ men_correlation = men_df.groupby('ervaring')['wattage'].corr(men_df['2k_wattage'
 print(f'Correlation coefficient for men:')
 print(men_correlation)
 
-# Filter the DataFrame for women
-# women_df = df[(df['geslacht'] == 'V') & (df['wattage'] >  threshold) & (df['2k_wattage'] > threshold)]
-
 # Scatter plot for women
 plt.figure(figsize=(10, 6))
-sns.scatterplot(x='wattage', y='2k_wattage', hue='ervaring', data=women_df)
+sns.regplot(x = "wattage", y = "2k_wattage", hue='ervaring', data = women_df)
+# sns.scatterplot(x='wattage', y='2k_wattage', hue='ervaring', data=women_df)
 plt.title('Correlation between 500m Split Wattage and 2k Wattage (Women)')
 plt.xlabel('500m Split Wattage')
 plt.ylabel('2k Wattage')
@@ -329,12 +325,10 @@ print(women_correlation)
 # Set the threshold
 threshold = 0.001
 
-# Filter the DataFrame for men
-# men_df = df[(df['geslacht'] == 'M') & (df['wattage'] < threshold) & (df['2k_wattage'] < threshold)]
-
 # Scatter plot for men
 plt.figure(figsize=(10, 6))
-sns.scatterplot(x='wattage', y='2k_wattage', hue='gewichtsklasse', data=men_df)
+sns.regplot(x = "wattage", y = "2k_wattage", hue='gewichtsklasse', data = men_df)
+# sns.scatterplot(x='wattage', y='2k_wattage', hue='gewichtsklasse', data=men_df)
 plt.title('Correlation between 500m Split Wattage and 2k Wattage (Men)')
 plt.xlabel('500m Split Wattage')
 plt.ylabel('2k Wattage')
@@ -347,12 +341,10 @@ men_correlation = men_df.groupby('gewichtsklasse')['wattage'].corr(men_df['2k_wa
 print(f'Correlation coefficient for men:')
 print(men_correlation)
 
-# Filter the DataFrame for women
-# women_df = df[(df['geslacht'] == 'V') & (df['wattage'] <  threshold) & (df['2k_wattage'] < threshold)]
-
 # Scatter plot for women
 plt.figure(figsize=(10, 6))
-sns.scatterplot(x='wattage', y='2k_wattage', hue='gewichtsklasse', data=women_df)
+sns.regplot(x = "wattage", y = "2k_wattage", hue='gewichtsklasse', data = men_df)
+# sns.scatterplot(x='wattage', y='2k_wattage', hue='gewichtsklasse', data=women_df)
 plt.title('Correlation between 500m Split Wattage and 2k Wattage (Women)')
 plt.xlabel('500m Split Wattage')
 plt.ylabel('2k Wattage')
