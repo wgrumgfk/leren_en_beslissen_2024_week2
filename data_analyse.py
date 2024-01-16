@@ -90,7 +90,7 @@ plt.yticks([0.3,0.4,0.5,0.6,0.7,0.8,0.9,1])
 plt.xticks(fontsize = 6.5)
 plt.ylim(0.3, 1)
 plt.ylabel("% filled row entries")
-plt.show()
+# plt.show()
 
 print('Overig = datum, ervaring, geslacht, gewichtsklasse, ploeg, naam, trainingype, aantal_intervallen, intervaltype, interval_nummer' )
 
@@ -124,7 +124,7 @@ for group in [EJML, OJMZ, EJMZ, OJVL, EJVL, OJVZ, EJVZ]:
 plt.title("Amount of distinct rowers per group")
 plt.xlabel("Group")
 plt.ylabel("Amount of distinct rowers")
-plt.show()
+# plt.show()
 
 
 # PIECHART ##########################################################################################
@@ -135,7 +135,7 @@ pie_chart_df.plot(kind='pie', subplots=True, figsize=(8, 8), autopct='%1.0f%%')
 
 # show the plot
 plt.title('Percentage of data entries per group')
-plt.show()
+# plt.show()
 
 
 # BOXPLOT 2K tijd #####################################################################################
@@ -195,7 +195,7 @@ plt.xticks([1,2,3,4,5,6,7], boxplot_xticks)
 plt.xlabel("Group")
 plt.ylabel("2k times")
 plt.title("2k times per group")
-plt.show()
+# plt.show()
 
 # SCATTERPLOTS #################################################################################
 
@@ -225,7 +225,7 @@ plt.ylabel('2k Wattage')
 
 plt.legend()
 plt.grid(True)
-plt.show()
+# plt.show()
 
 # Correlation information for the filtered data
 correlation = filtered_df['wattage'].corr(filtered_df['2k_wattage'])
@@ -241,7 +241,7 @@ plt.title('Correlation between 500m Split Wattage and 2k Wattage (Men)')
 plt.xlabel('500m Split Wattage')
 plt.ylabel('2k Wattage')
 plt.grid(True)
-plt.show()
+# plt.show()
 
 # Correlation information for men
 men_correlation = men_df['wattage'].corr(men_df['2k_wattage'])
@@ -264,7 +264,7 @@ plt.title('Correlation between 500m Split Wattage and 2k Wattage (Women)')
 plt.xlabel('500m Split Wattage')
 plt.ylabel('2k Wattage')
 plt.grid(True)
-plt.show()
+# plt.show()
 
 # Correlation information for women with threshold
 women_correlation = filtered_women_df['wattage'].corr(filtered_women_df['2k_wattage'])
@@ -284,7 +284,7 @@ plt.xlabel('500m Split Wattage')
 plt.ylabel('2k Wattage')
 plt.legend(title='Experience')
 plt.grid(True)
-plt.show()
+# plt.show()
 
 # Correlation information for men
 men_correlation = men_df.groupby('ervaring')['wattage'].corr(men_df['2k_wattage'])
@@ -302,7 +302,7 @@ plt.xlabel('500m Split Wattage')
 plt.ylabel('2k Wattage')
 plt.legend(title='Experience')
 plt.grid(True)
-plt.show()
+# plt.show()
 
 # Correlation information for women
 women_correlation = women_df.groupby('ervaring')['wattage'].corr(women_df['2k_wattage'])
@@ -323,7 +323,7 @@ plt.xlabel('500m Split Wattage')
 plt.ylabel('2k Wattage')
 plt.legend(title='Gewichtsklasse')
 plt.grid(True)
-plt.show()
+# plt.show()
 
 # Correlation information for men
 men_correlation = men_df.groupby('gewichtsklasse')['wattage'].corr(men_df['2k_wattage'])
@@ -341,7 +341,7 @@ plt.xlabel('500m Split Wattage')
 plt.ylabel('2k Wattage')
 plt.legend(title='gewichtsklasse')
 plt.grid(True)
-plt.show()
+# plt.show()
 
 # Correlation information for women
 women_correlation = women_df.groupby('gewichtsklasse')['wattage'].corr(women_df['2k_wattage'])
@@ -356,24 +356,26 @@ filtered_df.loc[:, 'rate_difference'] = (
     filtered_df['wattage'] / filtered_df['2k_wattage']
 )
 
+print(filtered_df['rate_difference'])
+
 filtered_df.loc[:, 'difference'] = (
     filtered_df['wattage'] - filtered_df['2k_wattage']
 )
 
 def improvement_by_feature_and_person(filtered_df, feature):
-    filtered_df = df.dropna(subset=[feature])
+    filtered_df = filtered_df.dropna(subset=[feature])
     unique_values = filtered_df[feature].unique()
     print(unique_values)
     data = []
 
     for value in unique_values:
-        men = filtered_df.loc[(df[feature] == value)]
+        men = filtered_df.loc[filtered_df[feature] == value]
         unique_men = men.naam.drop_duplicates().tolist()
         men_df = filtered_df[filtered_df['naam'].isin(unique_men)]
         men_improvement = men_df['rate_difference'].tolist()
         data.append(men_improvement)
 
     plt.boxplot(data, labels=unique_values, notch=None, vert=None, patch_artist=None, widths=None)
-    plt.show()
+    # plt.show()
 
 improvement_by_feature_and_person(filtered_df, 'zone')
