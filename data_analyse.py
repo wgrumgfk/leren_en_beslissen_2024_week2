@@ -34,6 +34,44 @@ report_analytics = seperated_df[KOLOM]['empty']
 Kun je omschrijven of er specifieke afwijkingen zijn zoals 'machine' ineens niet meer ingevuld
 """
 
+# Specify here what dataframe you want to use 
+# df = seperated_df[..]['filled'] merged with ..........
+df = non_empty_df
+
+# GENERAL FUNCTIONS ########################################################################
+
+def entry_to_seconds(entry):
+    if pd.isna(entry):
+        return None
+    
+    # Replace commas with dots
+    entry = entry.replace(',', '.')
+    
+    # Split the entry based on both ':' and '.'
+    split_chars = [':', '.']
+    parts = None
+    for char in split_chars:
+        if char in entry:
+            parts = entry.split(char)
+            break
+    
+    if parts is None:
+        raise ValueError("Invalid time string format")
+    
+    # Convert the parts to numeric values
+    minutes = pd.to_numeric(parts[0])
+    seconds = pd.to_numeric(parts[1])
+    
+    if len(parts) > 2:
+        little_seconds = pd.to_numeric(parts[2])
+        return minutes * 60 + seconds + little_seconds / 100
+    else:
+        return minutes * 60 + seconds
+
+def seconds_to_wattage(df, column_name):
+    # Apply the process_entry function to the specified column
+    return 2.8 / df[column_name].apply(entry_to_seconds) ** 3
+
 # FILLED ENTRIES PER COLUMN ################################################################
 
 # TO DO plot distribution of filled entries for every feature of the dataset.
@@ -55,10 +93,6 @@ plt.ylabel("% filled row entries")
 plt.show()
 
 print('Overig = datum, ervaring, geslacht, gewichtsklasse, ploeg, naam, trainingype, aantal_intervallen, intervaltype, interval_nummer' )
-
-# Specify here what dataframe you wanna use 
-# df = seperated_df[..]['filled'] merged with ..........
-df = non_empty_df
 
 # Split the dataset in groups based on gender, experience and weight
 
@@ -122,14 +156,9 @@ for group in [EJML, OJMZ, EJMZ, OJVL, EJVL, OJVZ, EJVZ]:
         float_times = []
         for time in time_set:
             if isinstance(time, str):
-                split_string = time.split(':')
-                # convert string to float according to 2k time notation
-                if len(split_string) > 2:
-                    str_to_float = (float(time.split(':')[1]) * 60) +  float((time.split(':')[2]))
-                elif len(split_string) == 2:
-                    str_to_float = (float(time.split(':')[0]) * 60) +  float((time.split(':')[1]))
-                float_times.append(str_to_float)
-                rower_2k_per_group[x_labels[i]][rower] = float_times         
+                float_time = entry_to_seconds(time)
+                float_times.append(float_time)
+                rower_2k_per_group[x_labels[i]][rower] = float_times
             else:
                 pass
 
@@ -168,53 +197,15 @@ plt.ylabel("2k times")
 plt.title("2k times per group")
 plt.show()
 
-# CONVERT TIME TO WATTAGE ##################################################################
+# SCATTERPLOTS #################################################################################
 
-def entry_to_seconds(entry):
-    if pd.isna(entry):
-        return None
-    
-    # Replace commas with dots
-    entry = entry.replace(',', '.')
-    
-    # Split the entry based on both ':' and '.'
-    split_chars = [':', '.']
-    parts = None
-    for char in split_chars:
-        if char in entry:
-            parts = entry.split(char)
-            break
-    
-    if parts is None:
-        raise ValueError("Invalid time string format")
-    
-    # Convert the parts to numeric values
-    minutes = pd.to_numeric(parts[0])
-    seconds = pd.to_numeric(parts[1])
-    
-    if len(parts) > 2:
-        little_seconds = pd.to_numeric(parts[2])
-        return minutes * 60 + seconds + little_seconds / 100
-    else:
-        return minutes * 60 + seconds
-
-def seconds_to_wattage(df, column_name):
-    # Apply the process_entry function to the specified column
-    return 2.8 / df[column_name].apply(entry_to_seconds) ** 3
-
+# calculate the wattage
 df.loc[:, 'wattage']= (
     seconds_to_wattage(df, '500_split')
 )
 df.loc[:, '2k_wattage'] = (
     seconds_to_wattage(df, '2k tijd')
 )
-# Display column names
-print(df.columns)
-
-# Display the first few rows of the dataframe
-print(df.head())
-
-# SCATTERPLOTS #################################################################################
 
 # Set the threshold
 threshold = 0.001
@@ -356,3 +347,33 @@ plt.show()
 women_correlation = women_df.groupby('gewichtsklasse')['wattage'].corr(women_df['2k_wattage'])
 print(f'Correlation coefficient for women:')
 print(women_correlation)
+
+# BOXPLOTS IMPROVENT ############################################################################
+
+filtered_df = df.dropna(subset=['500_split', '2k tijd'])
+
+filtered_df.loc[:, 'rate_difference'] = (
+    filtered_df['wattage'] / filtered_df['2k_wattage']
+)
+
+filtered_df.loc[:, 'difference'] = (
+    filtered_df['wattage'] - filtered_df['2k_wattage']
+)
+
+def improvement_by_feature_and_person(filtered_df, feature):
+    filtered_df = df.dropna(subset=[feature])
+    unique_values = filtered_df[feature].unique()
+    print(unique_values)
+    data = []
+
+    for value in unique_values:
+        men = filtered_df.loc[(df[feature] == value)]
+        unique_men = men.naam.drop_duplicates().tolist()
+        men_df = filtered_df[filtered_df['naam'].isin(unique_men)]
+        men_improvement = men_df['rate_difference'].tolist()
+        data.append(men_improvement)
+
+    plt.boxplot(data, labels=unique_values, notch=None, vert=None, patch_artist=None, widths=None)
+    plt.show()
+
+improvement_by_feature_and_person(filtered_df, 'zone')
