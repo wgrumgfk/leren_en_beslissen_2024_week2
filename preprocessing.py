@@ -49,6 +49,7 @@ def days_difference(date_training, date_2k):
     d2k = date(int(date_2k_split[2]), int(date_2k_split[1]), int(date_2k_split[0]))
     return (d2k - dtrain).days
     
+    
 if __name__ == "__main__":
     raw_df = load_dataset()
     # replace spaces with _ in columns
@@ -59,7 +60,6 @@ if __name__ == "__main__":
     # Remove all completely empty rows or when theres only a single 2k date filled, 
     non_empty_df = raw_df.dropna(how='all', subset=(col_names[:-1]))
 
-    #print(non_empty_df)
 
     # Add 500m split to seconds column 
     # Select all 500m_split entries and convert to seconds and insert new column into df
@@ -74,15 +74,24 @@ if __name__ == "__main__":
     non_empty_df.insert(19, "2k_tijd_sec", col_two_k_sec, True)
 
 
-    # Calculate amount days between training date and 2k date.
-    #cols_datums = non_empty_df.dropna(how='any', subset=(['datum', '2k datum'])).loc[:,["500_split", "2k tijd"]]
-    non_empty_df['days_until_2k'] = non_empty_df.apply(lambda x: days_difference(x.datum, x.two_k_datum), axis=1)
+    # Calculate amount days between training date and 2k date and add as days_until_2k column
+    col_date_difference = non_empty_df.apply(lambda x: days_difference(x.datum, x.two_k_datum), axis=1)
+    non_empty_df.insert(21, "days_until_2k", col_date_difference, True)
+
+    # Add dummy Man column
+    # if man = 0 then vrouw
+    col_man_dummy = non_empty_df.apply(lambda x: 1 if x.geslacht=='M' else 0 , axis=1)
+    non_empty_df.insert(3, "Man_dummy", col_man_dummy, True)
+
+    # Add dummy zwaar column
+    # if zwaar = 0 then licht
+    col_zwaar_dummy = non_empty_df.apply(lambda x: 1 if x.gewichtsklasse=='Z' else 0 , axis=1)
+    non_empty_df.insert(5, "Zwaar_dummy", col_zwaar_dummy, True)
+
     
-    #cols_datums_days = non_empty_df.apply(lambda x: f(x.datum, x.2k datum), axis=1)
     
-    #non_empty_df.insert(19, "2k_tijd_sec", col_two_k_sec, True)
-    #print(date_difference(two_k_split.loc[0],two_k_split.loc[10]))
-    
-    #print(non_empty_df)
+
+    #TODO 
+    #Add column with mean interval 500_split
 
     non_empty_df.to_csv('okeanos_processed.csv')
