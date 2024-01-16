@@ -1,13 +1,18 @@
+# GET STARTED ################################################################################
+
+# import packages
 import pandas as pd
 import os
+import numpy as np
 import matplotlib.pyplot as plt
 from statistics import mean
+import seaborn as sns
 
-print('aanpasswbfwiejbfing')
-
+# import dataframe
 cwd = os.getcwd()
-csv_path = "/home/bardha/Leren Beslissen/okeanos.csv"
+csv_path = cwd + "/okeanos.csv"
 raw_df = pd.read_csv(csv_path, delimiter=',', na_values=['', 'NA', 'N/A', 'NaN', 'nan'])
+
 # store column names in col_names
 col_names = raw_df.columns.tolist()
 
@@ -15,7 +20,7 @@ col_names = raw_df.columns.tolist()
 non_empty_df = raw_df.dropna(how='all', subset=(col_names[:-1]))
 print(len(non_empty_df) / len(raw_df), '% of raw datafile is non empty rows')
 
-# Store every colums as key in dictionary.
+# store every colum as key in dictionary
 # Seperate missing/filled value entries in dataframe as value. 
 seperated_df = dict()
 
@@ -29,7 +34,7 @@ report_analytics = seperated_df[KOLOM]['empty']
 Kun je omschrijven of er specifieke afwijkingen zijn zoals 'machine' ineens niet meer ingevuld
 """
 
-
+# FILLED ENTRIES PER COLUMN ################################################################
 
 # TO DO plot distribution of filled entries for every feature of the dataset.
 plt.bar('overig', len(seperated_df['datum']['filled'])/len(non_empty_df))
@@ -55,6 +60,8 @@ print('Overig = datum, ervaring, geslacht, gewichtsklasse, ploeg, naam, training
 # df = seperated_df[..]['filled'] merged with ..........
 df = non_empty_df
 
+# Split the dataset in groups based on gender, experience and weight
+
 # OJML has 0 entries in the raw_data_file
 #OJML = df.loc[(df['ervaring'] == 1) & (df['geslacht'] == "M") & (df['gewichtsklasse'] == "L")]
 EJML = df.loc[(df['ervaring'] == 0) & (df['geslacht'] == "M") & (df['gewichtsklasse'] == "L")]
@@ -67,7 +74,7 @@ OJVZ = df.loc[(df['ervaring'] == 1) & (df['geslacht'] == "V") & (df['gewichtskla
 EJVZ = df.loc[(df['ervaring'] == 0) & (df['geslacht'] == "V") & (df['gewichtsklasse'] == "Z")]
 
 
-###  BARPLOT
+# BARPLOT ####################################################################################
 
 i = 0
 # Change the order and colours of the groups to make sense
@@ -86,8 +93,8 @@ plt.ylabel("Amount of distinct rowers")
 plt.show()
 
 
-############################
-# Piechart
+# PIECHART ##########################################################################################
+
 pie_chart_df =  pd.DataFrame(amt_row_per_group, index=x_labels)
 # make the plot
 pie_chart_df.plot(kind='pie', subplots=True, figsize=(8, 8), autopct='%1.0f%%')
@@ -96,6 +103,8 @@ pie_chart_df.plot(kind='pie', subplots=True, figsize=(8, 8), autopct='%1.0f%%')
 plt.title('Percentage of data entries per group')
 plt.show()
 
+
+# BOXPLOT 2K tijd #####################################################################################
 i = 0
 x_labels = ["EJML", "OJMZ", "EJMZ", "OJVL", "EJVL", "OJVZ", "EJVZ"]
 rower_2k_per_group = {"EJML": dict(), "OJMZ": dict(), "EJMZ": dict(),
@@ -104,6 +113,8 @@ rower_2k_per_group = {"EJML": dict(), "OJMZ": dict(), "EJMZ": dict(),
 
 # Ik gooi de datum van de 2k hier weg. ALs er meerdere 2k tijden voor
 # een roeier zijn wil je de datum eigenlijk wel weten.
+
+# Make a list of all the 2K times of unique rowers
 for group in [EJML, OJMZ, EJMZ, OJVL, EJVL, OJVZ, EJVZ]:
     for rower in group.naam.drop_duplicates().tolist(): 
         #print(rower)
@@ -157,7 +168,7 @@ plt.ylabel("2k times")
 plt.title("2k times per group")
 plt.show()
 
-
+# CONVERT TIME TO WATTAGE ##################################################################
 
 def entry_to_seconds(entry):
     if pd.isna(entry):
@@ -203,10 +214,7 @@ print(df.columns)
 # Display the first few rows of the dataframe
 print(df.head())
 
-
-import seaborn as sns
-import matplotlib.pyplot as plt
-import numpy as np
+# SCATTERPLOTS #################################################################################
 
 # Set the threshold
 threshold = 0.001
@@ -231,8 +239,6 @@ plt.show()
 # Correlation information for the filtered data
 correlation = filtered_df['wattage'].corr(filtered_df['2k_wattage'])
 print(f'Correlation coefficient (under threshold): {correlation}')
-
-import seaborn as sns
 
 # Filter the DataFrame for men
 men_df = df[df['geslacht'] == 'M']
@@ -273,11 +279,6 @@ plt.show()
 women_correlation = filtered_women_df['wattage'].corr(filtered_women_df['2k_wattage'])
 print(f'Correlation coefficient for women (above threshold): {women_correlation}')
 
-
-
-
-import seaborn as sns
-
 # Set the threshold
 threshold = 0.001
 
@@ -317,13 +318,6 @@ women_correlation = women_df.groupby('ervaring')['wattage'].corr(women_df['2k_wa
 print(f'Correlation coefficient for women:')
 print(women_correlation)
 
-
-
-
-
-
-import seaborn as sns
-
 # Set the threshold
 threshold = 0.001
 
@@ -362,6 +356,3 @@ plt.show()
 women_correlation = women_df.groupby('gewichtsklasse')['wattage'].corr(women_df['2k_wattage'])
 print(f'Correlation coefficient for women:')
 print(women_correlation)
-
-
-
