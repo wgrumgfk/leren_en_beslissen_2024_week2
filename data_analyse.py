@@ -233,7 +233,7 @@ plt.ylabel('2k Wattage')
 
 plt.legend()
 plt.grid(True)
-plt.show()
+# plt.show()
 
 # Correlation information for the filtered data
 correlation = filtered_df['wattage'].corr(filtered_df['2k_wattage'])
@@ -241,6 +241,8 @@ print(f'Correlation coefficient (under threshold): {correlation}')
 
 # Filter the DataFrame for men
 men_df = df[df['geslacht'] == 'M']
+men_df = average_split_per_person(men_df)
+men_df = men_df.drop_duplicates(subset='naam', keep='first')
 
 # Scatter plot for men
 plt.figure(figsize=(10, 6))
@@ -258,6 +260,8 @@ print(f'Correlation coefficient for men: {men_correlation}')
 # Filter the DataFrame for women
 # Filter the DataFrame for women
 women_df = df[df['geslacht'] == 'V']
+women_df = average_split_per_person(women_df)
+women_df = women_df.drop_duplicates(subset='naam', keep='first')
 
 # Set the threshold
 threshold = 0.001
