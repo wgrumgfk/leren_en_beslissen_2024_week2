@@ -72,6 +72,11 @@ def seconds_to_wattage(df, column_name):
     # Apply the process_entry function to the specified column
     return 2.8 / df[column_name].apply(entry_to_seconds) ** 3
 
+def average_split_per_person(dataframe):
+    dataframe['tijd'] = df['500_split'].apply(entry_to_seconds)
+    dataframe['average_speed'] = dataframe.groupby('naam')['tijd'].transform('mean')
+    return dataframe
+
 # FILLED ENTRIES PER COLUMN ################################################################
 
 # TO DO plot distribution of filled entries for every feature of the dataset.
@@ -207,6 +212,9 @@ df.loc[:, '2k_wattage'] = (
     seconds_to_wattage(df, '2k tijd')
 )
 
+df = average_split_per_person(df)
+df = df.drop_duplicates(subset='naam', keep='first')
+
 # Set the threshold
 threshold = 0.001
 
@@ -225,7 +233,7 @@ plt.ylabel('2k Wattage')
 
 plt.legend()
 plt.grid(True)
-# plt.show()
+plt.show()
 
 # Correlation information for the filtered data
 correlation = filtered_df['wattage'].corr(filtered_df['2k_wattage'])
