@@ -77,6 +77,11 @@ def average_split_per_person(dataframe):
     dataframe['average_speed'] = dataframe.groupby('naam')['tijd'].transform('mean')
     return dataframe
 
+def average_split_per_person_and_zone(dataframe):
+    dataframe['tijd'] = df['500_split'].apply(entry_to_seconds)
+    dataframe['average_speed'] = dataframe.groupby(['naam', 'zone'])['tijd'].transform('mean')
+    return dataframe
+
 # FILLED ENTRIES PER COLUMN ################################################################
 
 # TO DO plot distribution of filled entries for every feature of the dataset.
@@ -202,7 +207,7 @@ plt.ylabel("2k times")
 plt.title("2k times per group")
 # plt.show()
 
-# SCATTERPLOTS #################################################################################
+# SCATTERPLOTS SORTED BY GENDER, EXPERIENCE AND WEIGHT #############################################
 
 # calculate the wattage
 df.loc[:, 'wattage']= (
@@ -217,19 +222,29 @@ df.loc[:, '2k_wattage'] = (
     2.8 / df['500_split_2k'] ** 3
 )
 
-df = average_split_per_person(df)
-df = df.drop_duplicates(subset='naam', keep='first')
-
 # Set the threshold
 threshold = 0.001
 
-# Filter the DataFrame
+# only keep data below threshold
 filtered_df = df[(df['wattage'] < threshold) & (df['2k_wattage'] < threshold)]
+
+# only one entry per person with average
+new_df = average_split_per_person(filtered_df)
+new_df = new_df.drop_duplicates(subset='naam', keep='first')
+
+# only one entry per man with average
+men_df = df[df['geslacht'] == 'M']
+men_df = average_split_per_person(men_df)
+men_df = men_df.drop_duplicates(subset='naam', keep='first')
+
+# only one entry per woman with average
+women_df = new_df[new_df['geslacht'] == 'V']
+women_df = average_split_per_person(women_df)
+women_df = women_df.drop_duplicates(subset='naam', keep='first')
 
 # Scatter plot
 plt.figure(figsize=(10, 6))
 sns.regplot(x = "wattage", y = "2k_wattage", data = filtered_df)
-# sns.scatterplot(x='wattage', y='2k_wattage', data=filtered_df)
 plt.title('Correlation between 500m Split Wattage and 2k Wattage (Under Threshold)')
 plt.xlabel('500m Split Wattage')
 plt.ylabel('2k Wattage')
@@ -242,49 +257,31 @@ plt.show()
 correlation = filtered_df['wattage'].corr(filtered_df['2k_wattage'])
 print(f'Correlation coefficient (under threshold): {correlation}')
 
-# Filter the DataFrame for men
-men_df = df[df['geslacht'] == 'M']
-men_df = average_split_per_person(men_df)
-men_df = men_df.drop_duplicates(subset='naam', keep='first')
-
 # Scatter plot for men
 plt.figure(figsize=(10, 6))
 sns.regplot(x = "wattage", y = "2k_wattage", data = men_df)
-# sns.scatterplot(x='wattage', y='2k_wattage', data=men_df)
 plt.title('Correlation between 500m Split Wattage and 2k Wattage (Men)')
 plt.xlabel('500m Split Wattage')
 plt.ylabel('2k Wattage')
 plt.grid(True)
-plt.show()
+# plt.show()
 
 # Correlation information for men
 men_correlation = men_df['wattage'].corr(men_df['2k_wattage'])
 print(f'Correlation coefficient for men: {men_correlation}')
 
-# Filter the DataFrame for women
-# Filter the DataFrame for women
-women_df = df[df['geslacht'] == 'V']
-women_df = average_split_per_person(women_df)
-women_df = women_df.drop_duplicates(subset='naam', keep='first')
-
-# Set the threshold
-threshold = 0.001
-
-# Filter the DataFrame based on the threshold
-filtered_women_df = women_df[(women_df['wattage'] < threshold) & (women_df['2k_wattage'] < threshold)]
 
 # Scatter plot for women
 plt.figure(figsize=(10, 6))
-sns.regplot(x = "wattage", y = "2k_wattage", data = filtered_women_df)
-# sns.scatterplot(x='wattage', y='2k_wattage', data=filtered_women_df)
+sns.regplot(x = "wattage", y = "2k_wattage", data = women_df)
 plt.title('Correlation between 500m Split Wattage and 2k Wattage (Women)')
 plt.xlabel('500m Split Wattage')
 plt.ylabel('2k Wattage')
 plt.grid(True)
-plt.show()
+# plt.show()
 
 # Correlation information for women with threshold
-women_correlation = filtered_women_df['wattage'].corr(filtered_women_df['2k_wattage'])
+women_correlation = women_df['wattage'].corr(women_df['2k_wattage'])
 print(f'Correlation coefficient for women (above threshold): {women_correlation}')
 
 # Set the threshold
@@ -292,8 +289,8 @@ threshold = 0.001
 
 # Scatter plot for men
 plt.figure(figsize=(10, 6))
-sns.regplot(x = "wattage", y = "2k_wattage", hue='ervaring', data = men_df)
-# sns.scatterplot(x='wattage', y='2k_wattage', hue='ervaring', data=men_df)
+sns.scatterplot(x='wattage', y='2k_wattage', hue='ervaring', data=men_df)
+sns.regplot(x = "wattage", y = "2k_wattage", data = men_df, scatter=False)
 plt.title('Correlation between 500m Split Wattage and 2k Wattage (Men)')
 plt.xlabel('500m Split Wattage')
 plt.ylabel('2k Wattage')
@@ -308,8 +305,8 @@ print(men_correlation)
 
 # Scatter plot for women
 plt.figure(figsize=(10, 6))
-sns.regplot(x = "wattage", y = "2k_wattage", hue='ervaring', data = women_df)
-# sns.scatterplot(x='wattage', y='2k_wattage', hue='ervaring', data=women_df)
+sns.scatterplot(x='wattage', y='2k_wattage', hue='ervaring', data=women_df)
+sns.regplot(x = "wattage", y = "2k_wattage", data = women_df, scatter=False)
 plt.title('Correlation between 500m Split Wattage and 2k Wattage (Women)')
 plt.xlabel('500m Split Wattage')
 plt.ylabel('2k Wattage')
@@ -327,8 +324,8 @@ threshold = 0.001
 
 # Scatter plot for men
 plt.figure(figsize=(10, 6))
-sns.regplot(x = "wattage", y = "2k_wattage", hue='gewichtsklasse', data = men_df)
-# sns.scatterplot(x='wattage', y='2k_wattage', hue='gewichtsklasse', data=men_df)
+sns.scatterplot(x='wattage', y='2k_wattage', hue='gewichtsklasse', data=men_df)
+sns.regplot(x = "wattage", y = "2k_wattage", data = men_df, scatter=False)
 plt.title('Correlation between 500m Split Wattage and 2k Wattage (Men)')
 plt.xlabel('500m Split Wattage')
 plt.ylabel('2k Wattage')
@@ -343,17 +340,63 @@ print(men_correlation)
 
 # Scatter plot for women
 plt.figure(figsize=(10, 6))
-sns.regplot(x = "wattage", y = "2k_wattage", hue='gewichtsklasse', data = men_df)
-# sns.scatterplot(x='wattage', y='2k_wattage', hue='gewichtsklasse', data=women_df)
+sns.scatterplot(x='wattage', y='2k_wattage', hue='gewichtsklasse', data=women_df)
+sns.regplot(x = "wattage", y = "2k_wattage", data = women_df, scatter=False)
 plt.title('Correlation between 500m Split Wattage and 2k Wattage (Women)')
 plt.xlabel('500m Split Wattage')
 plt.ylabel('2k Wattage')
 plt.legend(title='gewichtsklasse')
 plt.grid(True)
-plt.show()
+# plt.show()
 
 # Correlation information for women
 women_correlation = women_df.groupby('gewichtsklasse')['wattage'].corr(women_df['2k_wattage'])
+print(f'Correlation coefficient for women:')
+print(women_correlation)
+
+# SCATTERPLOTS SORTED BY ZONE #####################################################################
+
+# TO DO: FIND A SYSTEM TO NOT HAVE DOUBLES
+men_df = filtered_df[filtered_df['geslacht'] == 'M']
+women_df = filtered_df[filtered_df['geslacht'] == 'V']
+
+men_df = average_split_per_person_and_zone(men_df)
+men_df = men_df.drop_duplicates(subset=['naam', 'zone'], keep='first')
+
+women_df = average_split_per_person_and_zone(women_df)
+women_df = women_df.drop_duplicates(subset=['naam', 'zone'], keep='first')
+
+
+# Set the threshold
+threshold = 0.001
+
+# Scatter plot for men
+plt.figure(figsize=(10, 6))
+sns.scatterplot(x='wattage', y='2k_wattage', hue='zone', data=men_df)
+plt.title('Correlation between 500m Split Wattage and 2k Wattage (Men)')
+plt.xlabel('500m Split Wattage')
+plt.ylabel('2k Wattage')
+plt.legend(title='zone')
+plt.grid(True)
+plt.show()
+
+# Correlation information for men
+men_correlation = men_df.groupby('zone')['wattage'].corr(men_df['2k_wattage'])
+print(f'Correlation coefficient for men:')
+print(men_correlation)
+
+# Scatter plot for women
+plt.figure(figsize=(10, 6))
+sns.scatterplot(x='wattage', y='2k_wattage', hue='zone', data=women_df)
+plt.title('Correlation between 500m Split Wattage and 2k Wattage (Women)')
+plt.xlabel('500m Split Wattage')
+plt.ylabel('2k Wattage')
+plt.legend(title='zone')
+plt.grid(True)
+plt.show()
+
+# Correlation information for women
+women_correlation = women_df.groupby('zone')['wattage'].corr(women_df['2k_wattage'])
 print(f'Correlation coefficient for women:')
 print(women_correlation)
 
@@ -385,6 +428,6 @@ def improvement_by_feature_and_person(filtered_df, feature):
         data.append(men_improvement)
 
     plt.boxplot(data, labels=unique_values, notch=None, vert=None, patch_artist=None, widths=None)
-    # plt.show()
+    plt.show()
 
 improvement_by_feature_and_person(filtered_df, 'zone')
