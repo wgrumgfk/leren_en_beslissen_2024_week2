@@ -8,7 +8,8 @@ import matplotlib.pyplot as plt
 from statistics import mean
 import seaborn as sns
 
-# import dataframe
+print('aanpassing voor deze fime')
+
 cwd = os.getcwd()
 csv_path = cwd + "/okeanos.csv"
 raw_df = pd.read_csv(csv_path, delimiter=',', na_values=['', 'NA', 'N/A', 'NaN', 'nan'])
