@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 from statistics import mean
 from datetime import date
 
+# FUNCTIONS ###########################################################################################
 
 # convert Time notated in csv to amount of seconds.
 def time_notation_to_sec(time_notation):
@@ -61,6 +62,7 @@ def days_difference(date_training, date_2k):
     d2k = date(int(date_2k_split[2]), int(date_2k_split[1]), int(date_2k_split[0]))
     return (d2k - dtrain).days
 
+# PRECPROCESSING ######################################################################################  
 # input: dataframe and returns list with the same length
 # of entries. Every entry is the mean corresponding to the
 # current training for that particular 'name'.
@@ -113,6 +115,7 @@ def mean_500_per_training(input_df):
 
 
 if __name__ == "__main__":
+
     raw_df = load_dataset()
     # replace spaces with _ in columns
     raw_df = raw_df.rename(columns={"2k datum": "two_k_datum"})
@@ -132,36 +135,56 @@ if __name__ == "__main__":
     col_500_split_watt = col_500_split_sec.apply(split_500_to_watt)
     non_empty_df.insert(10, "500_split_watt", col_500_split_watt, True)
 
-    #Add column with mean interval 500_split for current training.
-    # interval_nr is 100 percent filled in!
-    col_mean_500 = mean_500_per_training(non_empty_df)
-    print(len(col_mean_500), len(non_empty_df))
-    non_empty_df['mean_watt_per_training'] = col_mean_500    # This column gives a SettingWithCopyWarning but is fully functional!
-
-    # Add 2k time to seconds column
+    # Calculate distance for every interval
+    non_empty_df['interval_afstand'] = non_empty_df.apply(time_to_distance, axis=1)
+    
+    # Add 2k time to seconds column 
     # Select all 2k_times entries and convert to seconds and insert new column into df
     col_two_k = non_empty_df.dropna(how='any', subset=('2k tijd')).loc[:,"2k tijd"]
     col_two_k_sec = col_two_k.apply(time_notation_to_sec)
-    non_empty_df.insert(20, "two_k_tijd_sec", col_two_k_sec, True)
+    non_empty_df.insert(1, "two_k_tijd_sec", col_two_k_sec, True)
 
     # Add watt column for 2k time
     col_two_k_tijd_sec = non_empty_df.dropna(how='any', subset=('two_k_tijd_sec')).loc[:,"two_k_tijd_sec"]
     col_two_k_watt = col_two_k_tijd_sec.apply(split_2k_to_watt)
-    non_empty_df.insert(21, "two_k_watt", col_two_k_watt, True)
+    non_empty_df.insert(1, "two_k_watt", col_two_k_watt, True)
+
 
     # Calculate amount days between training date and 2k date and add as days_until_2k column
     col_date_difference = non_empty_df.apply(lambda x: days_difference(x.datum, x.two_k_datum), axis=1)
-    non_empty_df.insert(23, "days_until_2k", col_date_difference, True)
+    non_empty_df.insert(1, "days_until_2k", col_date_difference, True)
 
-    # Add dummy Man column
-    # if man = 0 then vrouw
+    # Add dummy 'geslacht' column
+    # if geslacht == 0 then vrouw
     col_man_dummy = non_empty_df.apply(lambda x: 1 if x.geslacht=='M' else 0 , axis=1)
-    non_empty_df.insert(3, "Man_dummy", col_man_dummy, True)
+    non_empty_df.insert(2, "man", col_man_dummy, True)
 
-    # Add dummy zwaar column
-    # if zwaar = 0 then licht
+    # Add dummy 'gewicht' column
+    # if gewicht == 0 then licht
     col_zwaar_dummy = non_empty_df.apply(lambda x: 1 if x.gewichtsklasse=='Z' else 0 , axis=1)
-    non_empty_df.insert(5, "Zwaar_dummy", col_zwaar_dummy, True)
+    non_empty_df.insert(3, "zwaar", col_zwaar_dummy, True)
+
+    # Add dummy 'AT' column
+    # if AT == 0 then one of the others
+    col_AT = non_empty_df.apply(lambda x: 1 if x.zone=='AT' else 0 , axis=1)
+    non_empty_df.insert(4, "AT", col_AT, True)
+
+    # Add dummy 'I' column
+    # if AT == 0 then one of the others
+    col_I = non_empty_df.apply(lambda x: 1 if x.zone=='I' else 0 , axis=1)
+    non_empty_df.insert(5, "I", col_I, True)
+
+    # Add dummy 'ID' column
+    # if AT == 0 then one of the others
+    col_ID = non_empty_df.apply(lambda x: 1 if x.zone=='ID' else 0 , axis=1)
+    non_empty_df.insert(6, "ID", col_ID, True)
+
+    # Add dummy 'ED' column
+    # if ED == 0 then one of the others
+    col_ED = non_empty_df.apply(lambda x: 1 if x.zone=='ED' else 0 , axis=1)
+    non_empty_df.insert(7, "ED", col_ED, True)
+
+    non_empty_df.drop(columns=['datum', 'geslacht', 'gewichtsklasse', 'ploeg', 'naam', 'trainingype', 'interval_tijd'])
 
     #TODO
     # Dummy catagorien voor ZONE
