@@ -135,6 +135,12 @@ if __name__ == "__main__":
     col_500_split_watt = col_500_split_sec.apply(split_500_to_watt)
     non_empty_df.insert(10, "500_split_watt", col_500_split_watt, True)
 
+    #Add column with mean interval 500_split for current training.
+    # interval_nr is 100 percent filled in!
+    col_mean_500 = mean_500_per_training(non_empty_df)
+    print(len(col_mean_500), len(non_empty_df))
+    non_empty_df['mean_watt_per_training'] = col_mean_500    # This column gives a SettingWithCopyWarning but is fully functional!
+
     # Calculate distance for every interval
     non_empty_df['interval_afstand'] = non_empty_df.apply(time_to_distance, axis=1)
     
