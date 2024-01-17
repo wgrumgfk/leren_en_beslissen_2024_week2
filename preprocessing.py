@@ -28,7 +28,7 @@ def time_entry_to_distance(time_string):
 
 # Calculate watt from 500_m split in seconds.
 def split_500_to_watt(split):
-    return 2.8 / float(split) ** 3
+    return float(2.8 / (float(split) ** 3))
 
 def split_2k_to_watt(split):
     return split_500_to_watt(float(split) / 4)
@@ -50,7 +50,9 @@ def days_difference(date_training, date_2k):
     dtrain = date(int(date_training_split[2]), int(date_training_split[1]), int(date_training_split[0]))
     d2k = date(int(date_2k_split[2]), int(date_2k_split[1]), int(date_2k_split[0]))
     return (d2k - dtrain).days
-    
+
+  
+
     
 if __name__ == "__main__":
     raw_df = load_dataset()
@@ -69,7 +71,7 @@ if __name__ == "__main__":
 
     # Add watt column for 500m_split
     col_500_split_sec = non_empty_df.dropna(how='any', subset=('500_split_sec')).loc[:,"500_split_sec"]
-    col_500_split_watt = col_500_split_sec.apply(split_to_watt)
+    col_500_split_watt = col_500_split_sec.apply(split_500_to_watt)
     non_empty_df.insert(10, "500_split_watt", col_500_split_watt, True)
     
     # Add 2k time to seconds column 
@@ -80,7 +82,7 @@ if __name__ == "__main__":
 
     # Add watt column for 2k time
     col_two_k_tijd_sec = non_empty_df.dropna(how='any', subset=('two_k_tijd_sec')).loc[:,"two_k_tijd_sec"]
-    col_two_k_watt = col_two_k_tijd_sec.apply(split_to_watt)
+    col_two_k_watt = col_two_k_tijd_sec.apply(split_2k_to_watt)
     non_empty_df.insert(21, "two_k_watt", col_two_k_watt, True)
 
     # Calculate amount days between training date and 2k date and add as days_until_2k column
