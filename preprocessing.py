@@ -22,9 +22,16 @@ def time_notation_to_sec(time_notation):
         return ''
     return sec
 
+def time_entry_to_distance(time_string):
+    return None
+
+
 # Calculate watt from 500_m split in seconds.
-def split_to_watt(split):
-    return float((split / 500) / pow(0.25, 3))
+def split_500_to_watt(split):
+    return 2.8 / float(split) ** 3
+
+def split_2k_to_watt(split):
+    return split_500_to_watt(float(split) / 4)
 
 # Load .csv file and return raw dataframe
 def load_dataset():
