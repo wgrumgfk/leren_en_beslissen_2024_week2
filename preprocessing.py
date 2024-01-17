@@ -51,7 +51,32 @@ def days_difference(date_training, date_2k):
     d2k = date(int(date_2k_split[2]), int(date_2k_split[1]), int(date_2k_split[0]))
     return (d2k - dtrain).days
 
-  
+# input: dataframe and returns pd.Series object of same length
+# with mean for every training
+# interval_nummer = avg or 1-9
+# het komt voor dat maar een deel van de intervallen per training is ingevuld
+def mean_500_per_training(df):
+    cur_training_splits = []
+    interval_count = 0
+    column_entry_list = []
+    mean_500 = 0
+
+    for index, row in df.iterrows():
+        if ['interval_nummer'] in [1, "avg"]:
+            mean_500 = sum(cur_training_splits) / len(cur_training_splits)
+            for i in range(0, interval_count):
+                column_entry_list.append(mean_500)
+
+        elif row['500_split_watt'] > 0:
+            cur_training_splits.append(float(row['500_split_watt']))
+            interval_count = row['interval_nummer']
+        else:
+            print(index, 'index, is < 0, dit is de entry: ', row['500_split_watt'] )
+            pass
+
+
+    print(column_entry_list)
+    return 
 
     
 if __name__ == "__main__":
@@ -73,7 +98,18 @@ if __name__ == "__main__":
     col_500_split_sec = non_empty_df.dropna(how='any', subset=('500_split_sec')).loc[:,"500_split_sec"]
     col_500_split_watt = col_500_split_sec.apply(split_500_to_watt)
     non_empty_df.insert(10, "500_split_watt", col_500_split_watt, True)
-    
+
+
+
+    #TODO 
+    #Add column with mean interval 500_split for current training.
+    # interval_nr is 100 percent filled in!
+    col_mean_500 = mean_500_per_training(non_empty_df)
+    #non_empty_df.insert(11, "mean_500_current_training", col_mean_500, True)
+
+
+
+
     # Add 2k time to seconds column 
     # Select all 2k_times entries and convert to seconds and insert new column into df
     col_two_k = non_empty_df.dropna(how='any', subset=('2k tijd')).loc[:,"2k tijd"]
@@ -99,14 +135,18 @@ if __name__ == "__main__":
     col_zwaar_dummy = non_empty_df.apply(lambda x: 1 if x.gewichtsklasse=='Z' else 0 , axis=1)
     non_empty_df.insert(5, "Zwaar_dummy", col_zwaar_dummy, True)
 
-    #TODO 
-    #Add column with mean interval 500_split
-    # interval_nr is 100 percent filled in!
-    # If next interval_nr == 1/'avg'/'':
-    #     calculate mean of previous intervals
-    #     fill in the mean for previous intervals in df.mean_500_split_sec
-    
+    #TODO
+    # Dummy catagorien voor ZONE
 
-    #print(non_empty_df['two_k_watt'])
+    #TODO
+    #Dummy catagorien voor trainingstype
+
+    #TODO
+    # COLUMN voor trainingsafstand ongeacht of trainingstype tijd of interval is
+    # Per interval
+
+
+
+
     print('exported processed dataframe with new columns to okeanos_processed.csv')
     non_empty_df.to_csv('okeanos_processed.csv')
