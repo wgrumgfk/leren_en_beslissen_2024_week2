@@ -155,52 +155,31 @@ if __name__ == "__main__":
     col_two_k_watt = col_two_k_tijd_sec.apply(split_2k_to_watt)
     non_empty_df.insert(1, "two_k_watt", col_two_k_watt, True)
 
-
     # Calculate amount days between training date and 2k date and add as days_until_2k column
     col_date_difference = non_empty_df.apply(lambda x: days_difference(x.datum, x.two_k_datum), axis=1)
     non_empty_df.insert(1, "days_until_2k", col_date_difference, True)
 
-    # Add dummy 'geslacht' column
-    # if geslacht == 0 then vrouw
+    # Dummy categories
     col_man_dummy = non_empty_df.apply(lambda x: 1 if x.geslacht=='M' else 0 , axis=1)
     non_empty_df.insert(2, "man", col_man_dummy, True)
 
-    # Add dummy 'gewicht' column
-    # if gewicht == 0 then licht
     col_zwaar_dummy = non_empty_df.apply(lambda x: 1 if x.gewichtsklasse=='Z' else 0 , axis=1)
     non_empty_df.insert(3, "zwaar", col_zwaar_dummy, True)
 
-    # Add dummy 'AT' column
-    # if AT == 0 then one of the others
     col_AT = non_empty_df.apply(lambda x: 1 if x.zone=='AT' else 0 , axis=1)
     non_empty_df.insert(4, "AT", col_AT, True)
 
-    # Add dummy 'I' column
-    # if AT == 0 then one of the others
     col_I = non_empty_df.apply(lambda x: 1 if x.zone=='I' else 0 , axis=1)
     non_empty_df.insert(5, "I", col_I, True)
 
-    # Add dummy 'ID' column
-    # if AT == 0 then one of the others
     col_ID = non_empty_df.apply(lambda x: 1 if x.zone=='ID' else 0 , axis=1)
     non_empty_df.insert(6, "ID", col_ID, True)
 
-    # Add dummy 'ED' column
-    # if ED == 0 then one of the others
     col_ED = non_empty_df.apply(lambda x: 1 if x.zone=='ED' else 0 , axis=1)
     non_empty_df.insert(7, "ED", col_ED, True)
 
-    non_empty_df.drop(columns=['datum', 'geslacht', 'gewichtsklasse', 'ploeg', 'naam', 'trainingype', 'interval_tijd'])
-
-    #TODO
-    # Dummy catagorien voor ZONE
-
-    #TODO
-    #Dummy catagorien voor trainingstype
-
-    #TODO
-    # COLUMN voor trainingsafstand ongeacht of trainingstype tijd of interval is
-    # Per interval    
+    # Delete unecessary columns
+    non_empty_df.drop(columns=['datum', 'geslacht', 'gewichtsklasse', 'ploeg', 'naam', 'trainingype', 'interval_tijd'], inplace=True)
     
     print('exported processed dataframe with new columns to okeanos_processed.csv')
     non_empty_df.to_csv('okeanos_processed.csv')
