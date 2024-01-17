@@ -136,7 +136,7 @@ if __name__ == "__main__":
     # interval_nr is 100 percent filled in!
     col_mean_500 = mean_500_per_training(non_empty_df)
     print(len(col_mean_500), len(non_empty_df))
-    non_empty_df['mean_watt_per_training'] = col_mean_500    # This column gives a warning but is fully functional!
+    non_empty_df['mean_watt_per_training'] = col_mean_500    # This column gives a SettingWithCopyWarning but is fully functional!
 
     # Add 2k time to seconds column
     # Select all 2k_times entries and convert to seconds and insert new column into df
