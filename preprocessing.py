@@ -17,14 +17,24 @@ def time_notation_to_sec(time_notation):
         elif len(split_string) == 2:   # variant like 07:30.300
             sec = (float(split_string[0]) * 60) +  float(split_string[1])
         else:       # variant like 7:30.300
-            sec = (float(time_notation[0] * 60) + float(time_notation[2:]))            
+            sec = (float(time_notation[0] * 60) + float(time_notation[2:]))
     else:     # return empty string if empty entry
         return ''
     return sec
 
-def time_entry_to_distance(time_string):
-    return None
-
+def time_to_distance(row):
+    if pd.isna(row['interval_afstand']):
+        if row['interval_tijd'] == '6x60':
+            return float(360) / (float(row['500_split_sec']) * 2)
+        elif row['interval_tijd'] == '7x60/60r':
+            return float(420) / (float(row['500_split_sec']) * 2)
+        elif '5x60' in row['interval_tijd']:
+            return float(300) / (float(row['500_split_sec']) * 2)
+        elif row['interval_tijd'] == 'xx60' or '60/60':
+            return None
+        return float(row['interval_tijd']) / (float(row['500_split_sec']) * 2)
+    else:
+        return row['interval_afstand']
 
 # Calculate watt from 500_m split in seconds.
 def split_500_to_watt(split):
@@ -44,7 +54,7 @@ def load_dataset():
 def days_difference(date_training, date_2k):
     if (pd.isnull(date_2k)):
         return ''
-        
+
     date_training_split = date_training.split('-')
     date_2k_split = date_2k.split('-')
     dtrain = date(int(date_training_split[2]), int(date_training_split[1]), int(date_training_split[0]))
@@ -76,19 +86,19 @@ def mean_500_per_training(df):
 
 
     print(column_entry_list)
-    return 
+    return
 
-    
+
 if __name__ == "__main__":
     raw_df = load_dataset()
     # replace spaces with _ in columns
     raw_df = raw_df.rename(columns={"2k datum": "two_k_datum"})
     col_names = raw_df.columns.tolist()
-    
-    # Remove all completely empty rows or when theres only a single 2k date filled, 
+
+    # Remove all completely empty rows or when theres only a single 2k date filled,
     non_empty_df = raw_df.dropna(how='all', subset=(col_names[:-1]))
 
-    # Add 500m split to seconds column 
+    # Add 500m split to seconds column
     # Select all 500m_split entries and convert to seconds and insert new column into df
     col_500_split = non_empty_df.dropna(how='any', subset=('500_split')).loc[:,"500_split"]
     col_500_split_sec = col_500_split.apply(time_notation_to_sec)
@@ -101,7 +111,7 @@ if __name__ == "__main__":
 
 
 
-    #TODO 
+    #TODO
     #Add column with mean interval 500_split for current training.
     # interval_nr is 100 percent filled in!
     col_mean_500 = mean_500_per_training(non_empty_df)
@@ -110,7 +120,7 @@ if __name__ == "__main__":
 
 
 
-    # Add 2k time to seconds column 
+    # Add 2k time to seconds column
     # Select all 2k_times entries and convert to seconds and insert new column into df
     col_two_k = non_empty_df.dropna(how='any', subset=('2k tijd')).loc[:,"2k tijd"]
     col_two_k_sec = col_two_k.apply(time_notation_to_sec)
