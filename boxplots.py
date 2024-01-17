@@ -7,6 +7,7 @@ csv_path = r"okeanos.csv"
 df = pd.read_csv(csv_path)
 # Convert time stamps to seconds
 
+# Filter out rows with empty values
 filtered_df = df.dropna(subset=['500_split', '2k tijd'])
 
 def entry_to_seconds(entry):
@@ -35,18 +36,22 @@ def seconds_to_wattage(filtered_df, column_name):
     # Apply the process_entry function to the specified column
     return 2.8 / filtered_df[column_name].apply(entry_to_seconds) ** 3
 
+# Add 500 split wattage columns to dataframe
 filtered_df.loc[:, '500_split_wattage']= (
     seconds_to_wattage(filtered_df, '500_split')
 )
 
+# Add 2k wattage columns to dataframe
 filtered_df.loc[:, '2k_wattage']= (
     seconds_to_wattage(filtered_df, '2k tijd')
 )
 
+# Add rate difference column to dataframe
 filtered_df.loc[:, 'rate_difference'] = (
     filtered_df['500_split_wattage'] / filtered_df['2k_wattage']
 )
 
+# Add difference column to dataframe
 filtered_df.loc[:, 'difference'] = (
     filtered_df['500_split_wattage'] - filtered_df['2k_wattage']
 )
@@ -54,7 +59,8 @@ filtered_df.loc[:, 'difference'] = (
 
 def improvement_by_feature_and_person(filtered_df, feature):
     unique_values = filtered_df[feature].unique()
-    print(unique_values)
+    unique_values = [x for x in unique_values if str(x) != 'nan']
+
     data = []
 
     for value in unique_values:
@@ -65,6 +71,9 @@ def improvement_by_feature_and_person(filtered_df, feature):
         data.append(men_improvement)
 
     plt.boxplot(data, labels=unique_values, notch=None, vert=None, patch_artist=None, widths=None)
+    plt.xlabel(feature)
+    plt.ylabel('Wattage improvement 500m split training to 2k test')
+    plt.title('Improvement by Zone')
     plt.show()
 
 improvement_by_feature_and_person(filtered_df, 'zone')
