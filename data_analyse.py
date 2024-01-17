@@ -73,6 +73,7 @@ def seconds_to_wattage(df, column_name):
     # Apply the process_entry function to the specified column
     return 2.8 / df[column_name].apply(entry_to_seconds) ** 3
 
+
 def average_split_per_person(dataframe):
     dataframe['tijd'] = df['500_split'].apply(entry_to_seconds)
     dataframe['average_speed'] = dataframe.groupby('naam')['tijd'].transform('mean')
