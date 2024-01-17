@@ -47,7 +47,7 @@ def split_2k_to_watt(split):
 # Load .csv file and return raw dataframe
 def load_dataset():
     cwd = os.getcwd()
-    csv_path = cwd+"\okeanos.csv"
+    csv_path = cwd + "\okeanos.csv"
     return pd.read_csv(csv_path, delimiter=',', na_values=['', 'NA', 'N/A', 'NaN', 'nan'])
 
 # return difference in days between 2 time notations of the form
@@ -121,7 +121,7 @@ if __name__ == "__main__":
     raw_df = raw_df.rename(columns={"2k datum": "two_k_datum"})
     col_names = raw_df.columns.tolist()
 
-    # Remove all completely empty rows or when theres only a single 2k date filled,
+    # TO DO: only complete data
     non_empty_df = raw_df.dropna(how='all', subset=(col_names[:-1]))
 
     # Add 500m split to seconds column
@@ -139,10 +139,13 @@ if __name__ == "__main__":
     # interval_nr is 100 percent filled in!
     col_mean_500 = mean_500_per_training(non_empty_df)
     print(len(col_mean_500), len(non_empty_df))
-    non_empty_df['mean_watt_per_training'] = col_mean_500    # This column gives a SettingWithCopyWarning but is fully functional!
+    non_empty_df.loc[:, 'mean_watt_per_training'] = col_mean_500
+    # non_empty_df['mean_watt_per_training'] = col_mean_500    # This column gives a SettingWithCopyWarning but is fully functional!
 
     # Calculate distance for every interval
-    non_empty_df['interval_afstand'] = non_empty_df.apply(time_to_distance, axis=1)
+    non_empty_df.loc[:, 'interval_afstand'] = non_empty_df.apply(time_to_distance, axis=1)
+
+    # non_empty_df['interval_afstand'] = non_empty_df.apply(time_to_distance, axis=1)
     
     # Add 2k time to seconds column 
     # Select all 2k_times entries and convert to seconds and insert new column into df
@@ -179,7 +182,7 @@ if __name__ == "__main__":
     non_empty_df.insert(7, "ED", col_ED, True)
 
     # Delete unecessary columns
-    non_empty_df.drop(columns=['datum', 'geslacht', 'gewichtsklasse', 'ploeg', 'naam', 'trainingype', 'interval_tijd'], inplace=True)
-    
+    non_empty_df.drop(columns=['two_k_tijd_sec', 'ervaring', '500_split','500_split_sec','rust', 'machine', 'two_k_datum','datum', 'geslacht', 'gewichtsklasse', 'ploeg', 'naam', 'trainingype', 'interval_tijd', 'spm'], inplace=True)
+
     print('exported processed dataframe with new columns to okeanos_processed.csv')
     non_empty_df.to_csv('okeanos_processed.csv')
