@@ -22,9 +22,19 @@ def time_notation_to_sec(time_notation):
         return ''
     return sec
 
-def time_entry_to_distance(time_string):
-    return None
-
+def time_to_distance(row):
+    if pd.isna(row['interval_afstand']):
+        if row['interval_tijd'] == '6x60':
+            return float(360) / (float(row['500_split_sec']) * 2)
+        elif row['interval_tijd'] == '7x60/60r':
+            return float(420) / (float(row['500_split_sec']) * 2)
+        elif '5x60' in row['interval_tijd']:
+            return float(300) / (float(row['500_split_sec']) * 2)
+        elif row['interval_tijd'] == 'xx60' or '60/60':
+            return None
+        return float(row['interval_tijd']) / (float(row['500_split_sec']) * 2)
+    else:
+        return row['interval_afstand']
 
 # Calculate watt from 500_m split in seconds.
 def split_500_to_watt(split):
@@ -71,6 +81,9 @@ if __name__ == "__main__":
     col_500_split_sec = non_empty_df.dropna(how='any', subset=('500_split_sec')).loc[:,"500_split_sec"]
     col_500_split_watt = col_500_split_sec.apply(split_500_to_watt)
     non_empty_df.insert(10, "500_split_watt", col_500_split_watt, True)
+
+    # Calculate distance for every interval
+    non_empty_df['interval_afstand'] = non_empty_df.apply(time_to_distance, axis=1)
     
     # Add 2k time to seconds column 
     # Select all 2k_times entries and convert to seconds and insert new column into df
