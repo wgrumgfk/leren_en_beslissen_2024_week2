@@ -38,7 +38,7 @@ def time_to_distance(row):
 
 # Calculate watt from 500_m split in seconds.
 def split_500_to_watt(split):
-    return 2.8 / float(split) ** 3
+    return float(2.8 / (float(split) ** 3))
 
 def split_2k_to_watt(split):
     return split_500_to_watt(float(split) / 4)
@@ -60,7 +60,9 @@ def days_difference(date_training, date_2k):
     dtrain = date(int(date_training_split[2]), int(date_training_split[1]), int(date_training_split[0]))
     d2k = date(int(date_2k_split[2]), int(date_2k_split[1]), int(date_2k_split[0]))
     return (d2k - dtrain).days
-    
+
+  
+
     
 if __name__ == "__main__":
     raw_df = load_dataset()

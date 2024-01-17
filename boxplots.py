@@ -54,7 +54,6 @@ filtered_df.loc[:, 'difference'] = (
 
 def improvement_by_feature_and_person(filtered_df, feature):
     unique_values = filtered_df[feature].unique()
-    print(unique_values)
     data = []
 
     for value in unique_values:
