@@ -61,32 +61,55 @@ def days_difference(date_training, date_2k):
     d2k = date(int(date_2k_split[2]), int(date_2k_split[1]), int(date_2k_split[0]))
     return (d2k - dtrain).days
 
-# input: dataframe and returns pd.Series object of same length
-# with mean for every training
-# interval_nummer = avg or 1-9
-# het komt voor dat maar een deel van de intervallen per training is ingevuld
-def mean_500_per_training(df):
+# input: dataframe and returns list with the same length
+# of entries. Every entry is the mean corresponding to the
+# current training for that particular 'name'.
+def mean_500_per_training(input_df):
+
     cur_training_splits = []
     interval_count = 0
-    column_entry_list = []
-    mean_500 = 0
+    output = []
+    mean_500 = ""
 
-    for index, row in df.iterrows():
-        if ['interval_nummer'] in [1, "avg"]:
-            mean_500 = sum(cur_training_splits) / len(cur_training_splits)
-            for i in range(0, interval_count):
-                column_entry_list.append(mean_500)
-
-        elif row['500_split_watt'] > 0:
-            cur_training_splits.append(float(row['500_split_watt']))
-            interval_count = row['interval_nummer']
+    for index, row in input_df.iterrows():
+        
+        cur_interval_split = float(row['500_split_watt'])
+        # Convert interval_nummer str to int.
+        if row['interval_nummer'] == 'avg':
+            interval_nr = 1
         else:
-            print(index, 'index, is < 0, dit is de entry: ', row['500_split_watt'] )
-            pass
+            interval_nr = int(row['interval_nummer'])
+
+        # If new training encountered calculate mean of previous 
+        # training and add to output list.
+        if interval_nr == 1:
+            # Only calculate mean if previous training had valid 500_split entries
+            # otherwise mean = ''
+            if (len(cur_training_splits)):
+                mean_500 = sum(cur_training_splits) / len(cur_training_splits)
+
+            # Add the mean the amount of times by the previous amount of training intervals.
+            for i in range(0, interval_count):
+                output.append(mean_500)
+
+            # reset recorded splits and mean
+            cur_training_splits = []
+            mean_500 = ''
+
+        # Add current split if a valid split time (not '')
+        if row['500_split_watt'] > 0:
+            cur_training_splits.append(cur_interval_split)
+            interval_count = interval_nr
+        else:
+            interval_count = interval_nr
 
 
-    print(column_entry_list)
-    return
+    # Add mean of very last training in dataset to column
+    mean_500 = sum(cur_training_splits) / len(cur_training_splits)
+    for i in range(0, interval_count):
+        output.append(mean_500)
+
+    return output
 
 
 if __name__ == "__main__":
@@ -109,16 +132,11 @@ if __name__ == "__main__":
     col_500_split_watt = col_500_split_sec.apply(split_500_to_watt)
     non_empty_df.insert(10, "500_split_watt", col_500_split_watt, True)
 
-
-
-    #TODO
     #Add column with mean interval 500_split for current training.
     # interval_nr is 100 percent filled in!
     col_mean_500 = mean_500_per_training(non_empty_df)
-    #non_empty_df.insert(11, "mean_500_current_training", col_mean_500, True)
-
-
-
+    print(len(col_mean_500), len(non_empty_df))
+    non_empty_df['mean_watt_per_training'] = col_mean_500    # This column gives a warning but is fully functional!
 
     # Add 2k time to seconds column
     # Select all 2k_times entries and convert to seconds and insert new column into df
@@ -153,10 +171,7 @@ if __name__ == "__main__":
 
     #TODO
     # COLUMN voor trainingsafstand ongeacht of trainingstype tijd of interval is
-    # Per interval
-
-
-
-
+    # Per interval    
+    
     print('exported processed dataframe with new columns to okeanos_processed.csv')
     non_empty_df.to_csv('okeanos_processed.csv')
