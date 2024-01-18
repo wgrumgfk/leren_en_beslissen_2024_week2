@@ -181,12 +181,15 @@ if __name__ == "__main__":
     col_ED = non_empty_df.apply(lambda x: 1 if x.zone=='ED' else 0 , axis=1)
     non_empty_df.insert(7, "ED", col_ED, True)
 
+    col_ED_plus = non_empty_df.apply(lambda x: 1 if x.zone=='ED+' else 0 , axis=1)
+    non_empty_df.insert(7, "ED+", col_ED, True)
+
     col_time = non_empty_df.apply(lambda x: 1 if x.intervaltype=='afstand' else 0 , axis=1)
     non_empty_df.insert(8, "afstand", col_time, True)
 
     # Delete unecessary columns
     non_empty_df.drop(columns=['two_k_tijd_sec', 'ervaring', '500_split','500_split_sec','rust', 'machine', 'two_k_datum','datum', 'geslacht', 'gewichtsklasse', 'ploeg', 'naam', 'trainingype', 'interval_tijd', 'spm', 'zone'], inplace=True)
-    non_empty_df.dropna(subset=['days_until_2k', 'man', 'zwaar','AT','I','ID','ED','two_k_watt','500_split_watt','aantal_intervallen','intervaltype','interval_afstand','interval_nummer','2k tijd','mean_watt_per_training'], inplace=True)
+    non_empty_df.dropna(how = 'any', subset=['days_until_2k', 'man', 'zwaar','AT','I','ID','ED','two_k_watt','500_split_watt','aantal_intervallen','intervaltype','interval_afstand','interval_nummer','2k tijd','mean_watt_per_training'], inplace=True)
 
     print('exported processed dataframe with new columns to okeanos_processed.csv')
     non_empty_df.to_csv('okeanos_processed.csv')
