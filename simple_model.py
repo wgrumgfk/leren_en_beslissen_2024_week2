@@ -7,13 +7,13 @@ import pandas as pd
 # If your data is in a CSV file, you can read it using:
 
 df = pd.read_csv('okeanos_processed.csv')
-df.dropna(how = 'any', subset=['days_until_2k', 'man', 'zwaar','AT','I','ID','ED','two_k_watt','500_split_watt','aantal_intervallen','intervaltype','interval_afstand','interval_nummer','2k tijd','mean_watt_per_training'], inplace=True)
+df.dropna(how = 'any', subset=['days_until_2k', 'man', 'zwaar','AT','I','ID','ED','ED+','two_k_watt','500_split_watt','aantal_intervallen','afstand','interval_afstand','interval_nummer','2k tijd','mean_watt_per_training'], inplace=True)
 
 # Convert categorical variables to dummy/indicator variables (one-hot encoding)
 
 
 # Define features (X) and target variable (y)
-X = df[['days_until_2k', 'man', 'zwaar','AT','I','ID','ED','500_split_watt','interval_afstand','interval_nummer','mean_watt_per_training']]
+X = df[['days_until_2k', 'man', 'zwaar','AT','I','ID','ED','ED+','500_split_watt','aantal_intervallen','afstand','interval_afstand']]
 y = df['two_k_watt']
 
 # Split the data into training, validation, and testing sets
