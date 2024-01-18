@@ -7,7 +7,7 @@ import pandas as pd
 # If your data is in a CSV file, you can read it using:
 
 df = pd.read_csv('okeanos_processed.csv')
-
+df.dropna(how = 'any', subset=['days_until_2k', 'man', 'zwaar','AT','I','ID','ED','two_k_watt','500_split_watt','aantal_intervallen','intervaltype','interval_afstand','interval_nummer','2k tijd','mean_watt_per_training'], inplace=True)
 
 # Convert categorical variables to dummy/indicator variables (one-hot encoding)
 
