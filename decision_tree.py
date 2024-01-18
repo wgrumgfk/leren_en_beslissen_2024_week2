@@ -12,4 +12,5 @@ y = df['man']
 
 clf = tree.DecisionTreeClassifier()
 clf = clf.fit(X, y)
-# clf.predict([[88, 0,1,1,1,0,0.0000000477,4000,0.0000000000765]])
+predict = clf.predict([[88, 0,0,0,1,0,0.000000000277,4000,0.000000000000165]])
+print(predict)
