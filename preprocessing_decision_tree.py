@@ -113,9 +113,16 @@ if __name__ == "__main__":
     col_time = non_empty_df.apply(lambda x: 1 if x.intervaltype=='afstand' else 0 , axis=1)
     non_empty_df.insert(8, "afstand", col_time, True)
 
+
+
+
     # Delete unecessary columns
     non_empty_df.drop(columns=['ervaring', '500_split','rust', 'machine', 'two_k_datum','datum', 'geslacht', 'gewichtsklasse', 'ploeg', 'naam', 'trainingype', 'interval_tijd', 'spm', 'zone', '2k tijd'], inplace=True)
-    non_empty_df.dropna(how = 'any', subset=['days_until_2k', 'man', 'zwaar','AT','I','ID','ED','ED+','aantal_intervallen','afstand','interval_afstand','interval_nummer'], inplace=True)
+    non_empty_df.dropna(how = 'any', subset=['two_k_tijd_sec', 'days_until_2k', 'man', 'zwaar','AT','I','ID','ED','ED+','aantal_intervallen','afstand','interval_afstand','interval_nummer'], inplace=True)
 
+    non_empty_df.round({'two_k_tijd_sec': 1})
+    non_empty_df['two_k_tijd_sec'] = non_empty_df['two_k_tijd_sec'].astype(int)
+
+    print(non_empty_df.keys())
     print('exported processed dataframe with new columns to okeanos_processed.csv')
     non_empty_df.to_csv('okeanos_processed_decision_tree.csv')
