@@ -21,6 +21,7 @@ clf = clf.fit(X_train, y_train)
 
 #Predict the response for test dataset
 y_val_pred = clf.predict(X_val)
+print(y_val_pred)
 
 # Evaluate performance
 mse_val = mean_squared_error(y_val, y_val_pred)

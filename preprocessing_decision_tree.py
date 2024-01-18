@@ -119,7 +119,8 @@ if __name__ == "__main__":
     # Delete unecessary columns
     non_empty_df.drop(columns=['ervaring', '500_split','rust', 'machine', 'two_k_datum','datum', 'geslacht', 'gewichtsklasse', 'ploeg', 'naam', 'trainingype', 'interval_tijd', 'spm', 'zone', '2k tijd'], inplace=True)
     non_empty_df.dropna(how = 'any', subset=['two_k_tijd_sec', 'days_until_2k', 'man', 'zwaar','AT','I','ID','ED','ED+','aantal_intervallen','afstand','interval_afstand','interval_nummer'], inplace=True)
-
+    non_empty_df['two_k_tijd_sec'] = non_empty_df['two_k_tijd_sec'].multiply(10)
+    non_empty_df['500_split_sec'] = non_empty_df['two_k_tijd_sec'].multiply(10)
     non_empty_df.round({'two_k_tijd_sec': 1})
     non_empty_df['two_k_tijd_sec'] = non_empty_df['two_k_tijd_sec'].astype(int)
 
