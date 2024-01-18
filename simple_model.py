@@ -4,13 +4,17 @@ from sklearn.metrics import mean_squared_error
 import pandas as pd
 
 # Assume you have a DataFrame named 'df' with your data
-# If your data is in a CSV file, you can read it using: 
+# If your data is in a CSV file, you can read it using:
 
 df = pd.read_csv('okeanos_processed.csv')
 
+
+# Convert categorical variables to dummy/indicator variables (one-hot encoding)
+
+
 # Define features (X) and target variable (y)
-X = df['ervaring', 'man', 'zwaar', 'AT', 'ED', 'ED+', 'ID','I','wattage_500', 'n_interval', 'interval_afstand', 'days_until_2k']
-y = df['2k_time']
+X = df[['days_until_2k', 'man', 'zwaar','AT','I','ID','ED','500_split_watt','interval_afstand','interval_nummer','mean_watt_per_training']]
+y = df['two_k_watt']
 
 # Split the data into training, validation, and testing sets
 X_train, X_temp, y_train, y_temp = train_test_split(X, y, test_size=0.4, random_state=42)
