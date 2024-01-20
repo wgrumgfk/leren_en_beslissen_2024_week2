@@ -16,7 +16,7 @@ raw_df = pd.read_csv(csv_path, delimiter=',', na_values=['', 'NA', 'N/A', 'NaN',
 
 # store column names in col_names
 col_names = raw_df.columns.tolist()
-
+print(raw_df.shape)
 # Remove all completely empty rows or when theres only a single 2k date filled, 
 non_empty_df = raw_df.dropna(how='all', subset=(col_names[:-1]))
 print(len(non_empty_df) / len(raw_df), '% of raw datafile is non empty rows')
