@@ -45,9 +45,11 @@ def split_500_to_watt(split):
 def split_2k_to_watt(split):
     return split_500_to_watt(float(split / 4))
 
+# Calculate 500 m split from input watt.
+# If input is empty return ''   
 def watt_to_pace(watt):
     if isinstance(watt, float):
-        return float(500 * float(2.8/float(watt))**(1/3))
+        return float(500 * (float(2.8/float(watt))**(1/3)))
     
     return ''
 
@@ -71,8 +73,6 @@ def days_difference(date_training, date_2k):
     
     if abs((d2k - dtrain).days) > 0:
         return abs((d2k - dtrain).days)
-    
-    return ''
 
 # Return '' if input is 0 or empty value.
 # Return seconds if input is in minutes.
@@ -214,7 +214,34 @@ if __name__ == "__main__":
     col_ED_plus = non_empty_df.apply(lambda x: 1 if x.zone=='ED+' else 0 , axis=1)
     non_empty_df.insert(10, "ED+", col_ED, True)
 
+    #Dummy categorical variables voor trainingype
+    # all types: 
+    """
+    ["5x5'", "3x15'", "3x20'", "3x2000m/5'r", '6000m', '4x1500m', "3x1000m/5'r",
+    "6x500m/2'r", '1500m', "1'", '2000m', "30'", '3x2000m', "3x20'/3'r",
+    "3x6x1'/1'r", 'minuutjes', '2x2000m', '6x500m', '3x1000m', "8x5'/3'r",
+    "3x4000m/4'r", "4x8'/4'r", "3x10'", '1000m', '1500m + 500m', "4x8'", "8x3'",
+    '4x750m', "3x10'/5'r", '2x2000m + 500m', "3x7x1'/1'r /3'r", '1000m + 500m',
+    "3x5x1'/1'r /5'r", "4x5'", "3x12'", "2x25'", '8x500m', "4x2000/5'r", '100m',
+    '500m', "3x20'/5'r", '1500m+500m', "HOP+3x1'r", '3x4000m', "3x7'", "3x8'",
+    '1000m+500m', "3x10'/3'r", "3x2000/3'r", "4x5'/5'r", '2000', "3x12'/3'r",
+    "4x500/5'r", "3x3000/5'r", "3x15'/3'r", "8x3'/3'r", "7x3'/3'r", "2x19'/3'r",
+    "2x3000/5'r", "6x750/5'r", "2x2000/5'r", '1000', "3x8'/5'r", '1500m+750m',
+    "3x12'/5'r", "2x6x1'/1'r", "2x7x1'/1'r", "3x11'", "6x6'", "3x13'", "5x8'", "20'",
+    "3x2000m/4'r", "3x10'/4'r", "3x1000m/3'r", "8x3'/2'r", "6x750/3'r",
+    "3x7x1'/1'r", "3x1500/5'r", "4x8'/5'r", '6000', "2x10'/5'r", "2x4x20''/40''r",
+    "1x20'", "3x5x1'/1'r", "6x5'/2'r", "7x3'/2'r", "3x2000/5'r" ,"4x4x40''/40''r",
+    "9x3'/2'r", "3x8x1'/1'r", "5x5'/3'r", "5x7'/3'r", "5x9'/3'r", "3x1000/3'r",
+    "2x12'/8'r", "3x8x40'/20'r", "3x16'/3'r", "3x7'/5'r", "6x3'/3'r", "9x3'/3'r"]
+    """
+    all_trainingtypes = non_empty_df['trainingype'].unique()
+    # print(all_trainingtypes)
+    for trainingtype in all_trainingtypes:
+        col_trainingtype = non_empty_df.apply(lambda x: 1 if x.trainingype==trainingtype else 0 , axis=1)
+        non_empty_df.insert(6, str(trainingtype), col_trainingtype, True)
+
     # Add a rust_seconds column
+    # Deze column verslechtert de presatie van het model helaas.
     col_rust_sec = non_empty_df.apply(lambda x: rust_seconden(x.rust) , axis=1)
     non_empty_df.insert(4, "rust_sec", col_rust_sec, True)
 
@@ -224,7 +251,7 @@ if __name__ == "__main__":
 
     # Delete unnecessary columns
     # trainingstype dummy variables maken?
-    non_empty_df.drop(columns=['2k tijd', '500_split','rust', 'machine', 'two_k_datum','datum', 'geslacht', 'gewichtsklasse', 'ploeg', 'naam', 'trainingype', 'spm', 'zone'], inplace=True)
+    non_empty_df.drop(columns=['2k tijd', '500_split','rust', 'machine', 'two_k_datum','datum', 'geslacht', 'gewichtsklasse', 'ploeg', 'naam', 'intervaltype', 'trainingype', 'spm', 'zone'], inplace=True)
 
     print('exported processed dataframe with new columns to okeanos_processed.csv')
 
