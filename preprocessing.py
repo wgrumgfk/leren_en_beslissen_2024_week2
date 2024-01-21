@@ -22,7 +22,7 @@ def time_notation_to_sec(time_notation):
         return ''
     return sec
 
-# functie frederique??
+# Convert interval_tijd to interval_afstand
 def time_to_distance(row):
     if pd.isna(row['interval_afstand']):
         if row['interval_tijd'] == '6x60':
@@ -245,7 +245,7 @@ if __name__ == "__main__":
     col_rust_sec = non_empty_df.apply(lambda x: rust_seconden(x.rust) , axis=1)
     non_empty_df.insert(4, "rust_sec", col_rust_sec, True)
 
-    # ?????????
+    # Add a dummy for intervaltype
     col_time = non_empty_df.apply(lambda x: 1 if x.intervaltype=='afstand' else 0 , axis=1)
     non_empty_df.insert(11, "afstand", col_time, True)
 
