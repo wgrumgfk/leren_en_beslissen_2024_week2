@@ -33,8 +33,6 @@ for col in col_names:
 # TO DO plot distribution of filled entries for every feature of the dataset.
 plt.bar('other', len(seperated_df['datum']['filled'])/len(non_empty_df) * 100)
 
-
-
 for col in col_names:
     # if len(seperated_df[col]['filled'])/len(non_empty_df) != 1.0:
     # All these columns are fully filled in in the dataset.
