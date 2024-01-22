@@ -56,7 +56,7 @@ def watt_to_pace(watt):
 # Load .csv file and return raw dataframe
 def load_dataset():
     cwd = os.getcwd()
-    csv_path = cwd + "\okeanos.csv"
+    csv_path = cwd +"/okeanos.csv"
     return pd.read_csv(csv_path, delimiter=',', na_values=['', 'NA', 'N/A', 'NaN', 'nan'])
 
 # return absolute difference in days between 2 time notations of the form
@@ -214,6 +214,24 @@ if __name__ == "__main__":
     col_ED_plus = non_empty_df.apply(lambda x: 1 if x.zone=='ED+' else 0 , axis=1)
     non_empty_df.insert(10, "ED+", col_ED, True)
 
+    
+    # Replace 'interval_nummer' with the actual column name in your DataFrame
+    col_1 = non_empty_df.apply(lambda x: 1 if x.interval_nummer == 1 else 0, axis=1)
+    non_empty_df.insert(11, "interval_nummer_1", col_1, True)
+
+    col_2 = non_empty_df.apply(lambda x: 1 if x.interval_nummer == 2 else 0, axis=1)
+    non_empty_df.insert(12, "interval_nummer_2", col_2, True)
+
+    col_3 = non_empty_df.apply(lambda x: 1 if x.interval_nummer == 3 else 0, axis=1)
+    non_empty_df.insert(13, "interval_nummer_3", col_3, True)
+
+    col_4 = non_empty_df.apply(lambda x: 1 if x.interval_nummer == 4 else 0, axis=1)
+    non_empty_df.insert(14, "interval_nummer_4", col_4, True)
+
+    col_5 = non_empty_df.apply(lambda x: 1 if x.interval_nummer == 5 else 0, axis=1)
+    non_empty_df.insert(15, "interval_nummer_5", col_5, True)
+
+
     #Dummy categorical variables voor trainingype
     # all types: 
     """
@@ -254,6 +272,7 @@ if __name__ == "__main__":
     non_empty_df.drop(columns=['2k tijd', '500_split','rust', 'machine', 'two_k_datum','datum', 'geslacht', 'gewichtsklasse', 'ploeg', 'naam', 'intervaltype', 'trainingype', 'spm', 'zone'], inplace=True)
 
     print('exported processed dataframe with new columns to okeanos_processed.csv')
+
 
 
     non_empty_df.to_csv('okeanos_processed.csv')
