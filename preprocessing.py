@@ -24,16 +24,26 @@ def time_notation_to_sec(time_notation):
 
 # Convert interval_tijd to interval_afstand
 def time_to_distance(row):
-    if pd.isna(row['interval_afstand']):
+    if pd.notna(row['interval_tijd']) and pd.notna(row['500_split_sec']):
+        print('here')
         if row['interval_tijd'] == '6x60':
             return float(360) / (float(row['500_split_sec']) * 2)
-        elif row['interval_tijd'] == '7x60/60r':
+        elif row['interval_tijd'] == '7x60/60r' or row['interval_tijd'] == '7x60':
             return float(420) / (float(row['500_split_sec']) * 2)
         elif '5x60' in row['interval_tijd']:
             return float(300) / (float(row['500_split_sec']) * 2)
-        elif row['interval_tijd'] == 'xx60' or '60/60':
+        elif row['interval_tijd'] == '4x20':
+            return float(80) / (float(row['500_split_sec']) * 2)
+        elif row['interval_tijd'] == '7x1':
+            return float(420) / (float(row['500_split_sec']) * 2)
+        elif row['interval_tijd'] == '4x40':
+            return float(160) / (float(row['500_split_sec']) * 2)
+        elif row['interval_tijd'] == '8x60':
+            return float(480) / (float(row['500_split_sec']) * 2)
+        elif row['interval_tijd'] == 'xx60' or row['interval_tijd'] == '60/60'  or row['interval_tijd'] == 'xx40'  or row['interval_tijd'] == 'xx480':
             return None
-        return float(row['interval_tijd']) / (float(row['500_split_sec']) * 2)
+        else:
+            return float(row['interval_tijd']) / (float(row['500_split_sec']) * 2)
     else:
         return row['interval_afstand']
 
@@ -166,15 +176,19 @@ if __name__ == "__main__":
     col_mean_500_watt = mean_500_per_training(non_empty_df, True)
     non_empty_df.loc[:, 'mean_watt_per_training'] = col_mean_500_watt
     # non_empty_df['mean_watt_per_training'] = col_mean_500    # This column gives a SettingWithCopyWarning but is fully functional!
+    
+    
     #Add column with mean interval 500_split in seconds for current training.
     col_mean_500_secs = non_empty_df.apply(lambda x: watt_to_pace(x.mean_watt_per_training) , axis=1)
     non_empty_df.loc[:, 'mean_500_per_training'] = col_mean_500_secs
     # non_empty_df['mean_watt_per_training'] = col_mean_500    # This column gives a SettingWithCopyWarning but is fully functional!
 
     # Calculate distance for every interval and store as interval_afstand column.
-    non_empty_df.loc[:, 'interval_afstand'] = non_empty_df.apply(time_to_distance, axis=1)
+    # non_empty_df.loc[:, 'interval_afstand'] = non_empty_df['interval_afstand'].apply(time_to_distance)
     # non_empty_df['interval_afstand'] = non_empty_df.apply(time_to_distance, axis=1)
-    
+    non_empty_df['calculated_distance'] = non_empty_df.apply(time_to_distance, axis=1)
+    # Replace NaN values in 'distance' with calculated values
+    non_empty_df['interval_afstand'] = non_empty_df['calculated_distance'].combine_first(non_empty_df['interval_afstand'])
     # Add 2k time to seconds column 
     # Select all 2k_times entries and convert to seconds and insert new column into df
     col_two_k = non_empty_df.dropna(how='any', subset=('2k tijd')).loc[:,"2k tijd"]
