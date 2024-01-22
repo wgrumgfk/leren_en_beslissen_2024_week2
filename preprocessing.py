@@ -25,7 +25,6 @@ def time_notation_to_sec(time_notation):
 # Convert interval_tijd to interval_afstand
 def time_to_distance(row):
     if pd.notna(row['interval_tijd']) and pd.notna(row['500_split_sec']):
-        print('here')
         if row['interval_tijd'] == '6x60':
             return float(360) / (float(row['500_split_sec']) * 2)
         elif row['interval_tijd'] == '7x60/60r' or row['interval_tijd'] == '7x60':
