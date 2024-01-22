@@ -245,6 +245,18 @@ if __name__ == "__main__":
     col_5 = non_empty_df.apply(lambda x: 1 if x.interval_nummer == '5' else 0, axis=1)
     non_empty_df.insert(15, "interval_nummer_5", col_5, True)
 
+    col_6 = non_empty_df.apply(lambda x: 1 if x.interval_nummer == '6' else 0, axis=1)
+    non_empty_df.insert(16, "interval_nummer_6", col_6, True)
+
+    col_7 = non_empty_df.apply(lambda x: 1 if x.interval_nummer == '7' else 0, axis=1)
+    non_empty_df.insert(17, "interval_nummer_7", col_7, True)
+
+    col_8 = non_empty_df.apply(lambda x: 1 if x.interval_nummer == '8' else 0, axis=1)
+    non_empty_df.insert(18, "interval_nummer_8", col_8, True)
+
+    col_9 = non_empty_df.apply(lambda x: 1 if x.interval_nummer == '9' else 0, axis=1)
+    non_empty_df.insert(18, "interval_nummer_9", col_9, True)
+
 
     #Dummy categorical variables voor trainingype
     # all types: 
