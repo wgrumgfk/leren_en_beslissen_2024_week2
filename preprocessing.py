@@ -255,8 +255,10 @@ if __name__ == "__main__":
     non_empty_df.insert(18, "interval_nummer_8", col_8, True)
 
     col_9 = non_empty_df.apply(lambda x: 1 if x.interval_nummer == '9' else 0, axis=1)
-    non_empty_df.insert(18, "interval_nummer_9", col_9, True)
+    non_empty_df.insert(19, "interval_nummer_9", col_9, True)
 
+    col_avg = non_empty_df.apply(lambda x: 1 if x.interval_nummer == 'avg' else 0, axis=1)
+    non_empty_df.insert(20, "interval_nummer_avg", col_avg, True)
 
     #Dummy categorical variables voor trainingype
     # all types: 
@@ -287,15 +289,15 @@ if __name__ == "__main__":
     # Add a rust_seconds column
     # Deze column verslechtert de presatie van het model helaas.
     col_rust_sec = non_empty_df.apply(lambda x: rust_seconden(x.rust) , axis=1)
-    non_empty_df.insert(16, "rust_sec", col_rust_sec, True)
+    non_empty_df.insert(21, "rust_sec", col_rust_sec, True)
 
     # Add a dummy for intervaltype
     col_time = non_empty_df.apply(lambda x: 1 if x.intervaltype=='afstand' else 0 , axis=1)
-    non_empty_df.insert(17, "afstand", col_time, True)
+    non_empty_df.insert(22, "afstand", col_time, True)
 
     # Delete unnecessary columns
     # trainingstype dummy variables maken?
-    non_empty_df.drop(columns=['2k tijd', '500_split','rust', 'machine', 'two_k_datum','datum', 'geslacht', 'gewichtsklasse', 'ploeg', 'naam', 'intervaltype', 'trainingype', 'spm', 'zone'], inplace=True)
+    non_empty_df.drop(columns=['2k tijd', '500_split','rust', 'machine', 'two_k_datum','datum', 'geslacht', 'gewichtsklasse', 'ploeg', 'naam', 'intervaltype', 'trainingype', 'spm', 'zone', 'interval_nummer'], inplace=True)
 
     print('exported processed dataframe with new columns to okeanos_processed.csv')
 
