@@ -214,21 +214,21 @@ if __name__ == "__main__":
     col_ED_plus = non_empty_df.apply(lambda x: 1 if x.zone=='ED+' else 0 , axis=1)
     non_empty_df.insert(10, "ED+", col_ED, True)
 
-    
+    #Dummy categorical variables voor Interval_nummer
     # Replace 'interval_nummer' with the actual column name in your DataFrame
-    col_1 = non_empty_df.apply(lambda x: 1 if x.interval_nummer == 1 else 0, axis=1)
+    col_1 = non_empty_df.apply(lambda x: 1 if x.interval_nummer == '1' else 0, axis=1)
     non_empty_df.insert(11, "interval_nummer_1", col_1, True)
 
-    col_2 = non_empty_df.apply(lambda x: 1 if x.interval_nummer == 2 else 0, axis=1)
+    col_2 = non_empty_df.apply(lambda x: 1 if x.interval_nummer == '2' else 0, axis=1)
     non_empty_df.insert(12, "interval_nummer_2", col_2, True)
 
-    col_3 = non_empty_df.apply(lambda x: 1 if x.interval_nummer == 3 else 0, axis=1)
+    col_3 = non_empty_df.apply(lambda x: 1 if x.interval_nummer == '3' else 0, axis=1)
     non_empty_df.insert(13, "interval_nummer_3", col_3, True)
 
-    col_4 = non_empty_df.apply(lambda x: 1 if x.interval_nummer == 4 else 0, axis=1)
+    col_4 = non_empty_df.apply(lambda x: 1 if x.interval_nummer == '4' else 0, axis=1)
     non_empty_df.insert(14, "interval_nummer_4", col_4, True)
 
-    col_5 = non_empty_df.apply(lambda x: 1 if x.interval_nummer == 5 else 0, axis=1)
+    col_5 = non_empty_df.apply(lambda x: 1 if x.interval_nummer == '5' else 0, axis=1)
     non_empty_df.insert(15, "interval_nummer_5", col_5, True)
 
 
@@ -261,11 +261,11 @@ if __name__ == "__main__":
     # Add a rust_seconds column
     # Deze column verslechtert de presatie van het model helaas.
     col_rust_sec = non_empty_df.apply(lambda x: rust_seconden(x.rust) , axis=1)
-    non_empty_df.insert(4, "rust_sec", col_rust_sec, True)
+    non_empty_df.insert(16, "rust_sec", col_rust_sec, True)
 
     # Add a dummy for intervaltype
     col_time = non_empty_df.apply(lambda x: 1 if x.intervaltype=='afstand' else 0 , axis=1)
-    non_empty_df.insert(11, "afstand", col_time, True)
+    non_empty_df.insert(17, "afstand", col_time, True)
 
     # Delete unnecessary columns
     # trainingstype dummy variables maken?
