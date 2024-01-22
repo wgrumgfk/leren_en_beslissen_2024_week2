@@ -234,11 +234,11 @@ if __name__ == "__main__":
     "9x3'/2'r", "3x8x1'/1'r", "5x5'/3'r", "5x7'/3'r", "5x9'/3'r", "3x1000/3'r",
     "2x12'/8'r", "3x8x40'/20'r", "3x16'/3'r", "3x7'/5'r", "6x3'/3'r", "9x3'/3'r"]
     """
-    all_trainingtypes = non_empty_df['trainingype'].unique()
-    # print(all_trainingtypes)
-    for trainingtype in all_trainingtypes:
-        col_trainingtype = non_empty_df.apply(lambda x: 1 if x.trainingype==trainingtype else 0 , axis=1)
-        non_empty_df.insert(6, str(trainingtype), col_trainingtype, True)
+    # all_trainingtypes = non_empty_df['trainingype'].unique()
+    # # print(all_trainingtypes)
+    # for trainingtype in all_trainingtypes:
+    #     col_trainingtype = non_empty_df.apply(lambda x: 1 if x.trainingype==trainingtype else 0 , axis=1)
+    #     non_empty_df.insert(6, str(trainingtype), col_trainingtype, True)
 
     # Add a rust_seconds column
     # Deze column verslechtert de presatie van het model helaas.
