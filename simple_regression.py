@@ -14,7 +14,7 @@ all_cols = df.columns.to_list()
 
 # model_feat1 and model_feat2 are identical apart from extra dummy variable. As you can see the MSE is the same for both models
 # THis shows you can leave out 1 column for every catagorical variable you are transforming into dummy variables.
-model_feat1 = ['days_until_2k', 'man', 'vrouw', 'zwaar', 'licht', 'AT', 'I', 'ID', 'ED', 'ED+', 'ervaring', 'mean_500_per_training', 'two_k_tijd_sec']
+model_feat1 = ['days_until_2k', 'man', 'vrouw', 'zwaar', 'licht', 'AT', 'I', 'ID', 'ED', 'ED+', 'ervaring', 'mean_500_per_training', 'two_k_tijd_sec', 'interval_afstand']
 model_feat2 = ['days_until_2k', 'man', 'zwaar', 'AT', 'I', 'ID', 'ED', 'ervaring', 'mean_500_per_training', 'two_k_tijd_sec']
 
 # Specify features for every model you wanna compare.

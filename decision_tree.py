@@ -5,7 +5,7 @@ from sklearn.metrics import mean_squared_error
 from sklearn.model_selection import train_test_split
 from sklearn.tree import export_graphviz
 import pydotplus
-from sklearn.tree import DecisionTreeRegressor
+from sklearn import tree
 
 # Make sure all rows are complete
 df = pd.read_csv('okeanos_processed.csv')
@@ -30,18 +30,22 @@ X_train, X_temp, y_train, y_temp = train_test_split(X, y, test_size=0.4, random_
 X_val, X_test, y_val, y_test = train_test_split(X_temp, y_temp, test_size=0.5, random_state=42)
 
 # Train
-regressor = DecisionTreeRegressor()
-regressor = regressor.fit(X_train, y_train)
+clf = tree.DecisionTreeClassifier()
+clf = clf.fit(X_train, y_train)
+
+# Predict
+y_val_pred = clf.predict(X_test)
+print("Accuracy:",metrics.accuracy_score(y_test, y_val_pred))
 
 # Visualize the decision tree for regression
-dot_data = export_graphviz(
-    regressor,
-    out_file=None,
-    feature_names=feature_cols,
-    filled=True,
-    rounded=True,
-    special_characters=True
-)
+# dot_data = export_graphviz(
+#     regressor,
+#     out_file=None,
+#     feature_names=feature_cols,
+#     filled=True,
+#     rounded=True,
+#     special_characters=True
+# )
 
-graph = pydotplus.graph_from_dot_data(dot_data)
-graph.write_png('decision_tree_regression.png')
+# graph = pydotplus.graph_from_dot_data(dot_data)
+# graph.write_png('decision_tree_regression.png')
