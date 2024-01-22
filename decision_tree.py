@@ -7,7 +7,7 @@ from sklearn import tree
 
 # Make sure all rows are complete
 df = pd.read_csv('okeanos_processed.csv')
-df.dropna(how = 'any', subset=['days_until_2k', 'man', 'zwaar','AT','I','ID','ED','aantal_intervallen','intervaltype','interval_afstand','interval_nummer', 'two_k_tijd_sec'], inplace=True)
+df.dropna(how = 'any', subset=['days_until_2k', 'man', 'zwaar','AT','I','ID','ED','aantal_intervallen','interval_afstand','interval_nummer', 'two_k_tijd_sec'], inplace=True)
 
 
 # Delete unecessary columns
