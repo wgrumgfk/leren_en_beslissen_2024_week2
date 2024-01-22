@@ -8,7 +8,7 @@ from sklearn import tree
 
 # Make sure all rows are complete
 df = pd.read_csv('okeanos_processed.csv')
-df.dropna(how = 'any', subset=['two_k_tijd_sec', 'days_until_2k', 'man', 'zwaar','AT','I','ID','ED','aantal_intervallen','afstand','interval_afstand','interval_nummer'], inplace=True)
+df.dropna(how = 'any', subset=['two_k_tijd_sec', 'days_until_2k', 'man', 'zwaar','AT','I','ID','ED','aantal_intervallen','afstand','interval_afstand'], inplace=True)
 
 # Make 2k time and 500 split in tenths of seconds
 df['two_k_tijd_sec'] = df['two_k_tijd_sec'].multiply(10).astype(int)
