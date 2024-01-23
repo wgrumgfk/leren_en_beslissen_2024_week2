@@ -8,7 +8,7 @@ from sklearn import tree
 from sklearn.tree import DecisionTreeRegressor
 
 regressor = False
-wattage = True
+wattage = False
 
 def watt_to_pace(watt):
     # if isinstance(watt, int):
@@ -61,7 +61,7 @@ if regressor == True:
 
 if regressor == False: 
     y_train = y_train.multiply(10).astype(int)
-    y_val = y_train.multiply(10).astype(int)
+    y_val = y_val.multiply(10).astype(int)
 
     # Train
     clf = tree.DecisionTreeClassifier()
@@ -72,17 +72,17 @@ if regressor == False:
     y_val_pred = clf.predict(X_val)
 
     if wattage == True:
-        y_train_pred = numpy.array([watt_to_pace(x) for x in y_train_pred])
-        y_train = numpy.vectorize(watt_to_pace)(y_train)
+        y_train_pred = numpy.array([watt_to_pace(x) for x in y_train_pred]) * 0.1
+        y_train = numpy.vectorize(watt_to_pace)(y_train) * 0.1
 
-        y_val_pred = numpy.array([watt_to_pace(x) for x in y_val_pred])
-        y_val = numpy.vectorize(watt_to_pace)(y_val)
+        y_val_pred = numpy.array([watt_to_pace(x) for x in y_val_pred]) * 0.1
+        y_val = numpy.vectorize(watt_to_pace)(y_val) * 0.1
 
-    else: 
-        y_train *= .1
-        y_train_pred *= .1
-        y_val *= .1
-        y_val_pred *= .1
+    else:
+        y_train = y_train * .1
+        y_train_pred = y_train_pred * .1
+        y_val = y_val * .1
+        y_val_pred = y_val_pred * .1
 
     # Evaluate
     mse_train = mean_squared_error(y_train, y_train_pred)
