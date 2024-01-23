@@ -8,7 +8,7 @@ from sklearn import tree
 
 # Make sure all rows are complete
 df = pd.read_csv('okeanos_processed.csv')
-df.dropna(how = 'any', subset=['two_k_tijd_sec', 'days_until_2k', 'man', 'zwaar','AT','I','ID','ED','aantal_intervallen','afstand','interval_afstand'], inplace=True)
+df.dropna(how = 'any', subset = ['days_until_2k', 'man', 'zwaar','AT','I','ID','ED','500_split_sec','interval_afstand', 'ervaring', 'rust_sec', 'two_k_tijd_sec'], inplace=True)
 
 # Make 2k time and 500 split in tenths of seconds
 df['two_k_tijd_sec'] = df['two_k_tijd_sec'].multiply(10).astype(int)
@@ -31,5 +31,8 @@ clf = clf.fit(X_train, y_train)
 # Predict
 y_val_pred = clf.predict(X_val)
 mse_test = mean_squared_error(y_val * 0.1, y_val_pred * 0.1)
+baseline_prediction = sum(y_train)/len(y_train)
+baseline_mse_val = mean_squared_error(numpy.array([baseline_prediction for _ in range(len(y_val_pred))]), y_val)
 print(mse_test)
+print(baseline_mse_val)
 print("Accuracy:",metrics.accuracy_score(y_val, y_val_pred))
