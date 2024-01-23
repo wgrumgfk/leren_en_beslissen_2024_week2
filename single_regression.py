@@ -15,7 +15,7 @@ all_cols = df.columns.to_list()
 # Always put to be predicted value as last element in list
 model_feat1 = ['days_until_2k', 'man', 'vrouw', 'zwaar', 'licht', 'AT', 'I', 'ID', 'ED', 'ED+', 'ervaring', 'mean_watt_per_training', 'two_k_watt']
 model_feat2 = ['days_until_2k', 'man', 'vrouw', 'zwaar', 'licht', 'AT', 'I', 'ID', 'ED', 'ED+', 'ervaring', 'mean_watt_per_training', 'two_k_tijd_sec']
-model_feat8 = ['ervaring', 'man', 'days_until_2k', 'interval_afstand', 'mean_500_per_training', 'two_k_watt']
+model_feat3 = ['ervaring', 'man', 'days_until_2k', 'interval_afstand', 'mean_500_per_training', 'two_k_watt']
 #rand_seed = random.randint(0, 10000)
 rand_seed = 7
 model_nr = 1
@@ -24,7 +24,7 @@ print('Random seed is ', rand_seed)
 print('\n')
 # For every model calculate the val_mse. Store the model with best val_mse.
 # Also print the test_mse for this model.
-for model_feat in [model_feat1, model_feat2, model_feat8]:
+for model_feat in [model_feat1, model_feat2, model_feat3]:
     print("\n\nModel nr. ", model_nr)
     # Drop all rows if any of the feature data is missing:
     model_feat_df = df.dropna(how = 'any', subset=model_feat, inplace=False)
@@ -52,20 +52,16 @@ for model_feat in [model_feat1, model_feat2, model_feat8]:
 
     # Make predictions on the validation set
     y_val_pred = linear_reg_model.predict(X_val)
-    
      
     # validation from wattage to seconds
     if model_feat[-1] == 'two_k_watt':
         y_val_pred_sec = numpy.array([watt_to_pace(x) for x in y_val_pred])
         y_val_sec = numpy.array([watt_to_pace(x) for x in y_val])
-      
+        mse_val_sec = mean_squared_error(y_val_sec, y_val_pred_sec)
 
     # Evaluate the model on the validation set. Calculate the 
     # MSE in seconds, so calculate back if prediction was in watt.
-    mse_val = mean_squared_error(y_val, y_val_pred)
-    mse_val_sec = mean_squared_error(y_val_sec, y_val_pred_sec)
-
-   
+    mse_val = mean_squared_error(y_val, y_val_pred)   
 
     # Make predictions on the test set
     y_test_pred = linear_reg_model.predict(X_test)
@@ -74,22 +70,15 @@ for model_feat in [model_feat1, model_feat2, model_feat8]:
     if model_feat[-1] == 'two_k_watt':
         y_test_pred_sec = numpy.array([watt_to_pace(x) for x in y_test_pred])
         y_test_sec = numpy.array([watt_to_pace(x) for x in y_test])
-  
-
+        mse_test_sec = mean_squared_error(y_test_sec, y_test_pred_sec)
 
     # Evaluate the model on the test set
     # Again predict back to seconds if prediction was in watt.
     mse_test = mean_squared_error(y_test, y_test_pred)
-    mse_test_sec = mean_squared_error(y_test_sec, y_test_pred_sec)
-
-
 
     # transform y_train form wattage to seconds
-    y_train_sec = numpy.array([watt_to_pace(x) for x in y_train])
-
-    # baseline
     if model_feat[-1] == 'two_k_watt':
-        # Calculate the baseline mean 2k time for y_train
+        y_train_sec = numpy.array([watt_to_pace(x) for x in y_train])
         baseline_prediction_1= (sum(y_train_sec))/len(y_train)
         baseline_mse_val_sec = mean_squared_error(numpy.array([baseline_prediction_1 for i in range(len(y_val_pred_sec))]), y_val_sec)
         baseline_mse_test_sec = mean_squared_error(numpy.array([baseline_prediction_1 for i in range(len(y_test_pred_sec))]), y_test_sec)
@@ -99,18 +88,16 @@ for model_feat in [model_feat1, model_feat2, model_feat8]:
         baseline_mse_val = mean_squared_error(numpy.array([baseline_pred for i in range(len(y_val_pred))]), y_val)
         baseline_mse_test = mean_squared_error(numpy.array([baseline_pred for i in range(len(y_test_pred))]), y_test)
 
-
-
     # print statements
     if model_feat[-1] == 'two_k_watt':
         print(f'The model predicts in wattage but the MSE is calculated in seconds')
-        print(f'Mean Squared Error on Validation Set with seconds: {mse_val_sec}')
-        print(f'Baseline MSE on Validation Set with seconds:       {baseline_mse_val_sec}\n')
-        print(f'Mean Squared Error on Test Set with seconds: {mse_test_sec}')
-        print(f'Baseline MSE on Test Set with seconds     : {baseline_mse_test_sec}\n')
+        print(f'Mean Squared Error in seconds on Validation Set: {mse_val_sec}')
+        print(f'Baseline MSE in seconds on Validation Set:       {baseline_mse_val_sec}\n')
+        print(f'Mean Squared Error in seconds on Test Set: {mse_test_sec}')
+        print(f'Baseline MSE in seconds on Test Set      : {baseline_mse_test_sec}\n')
     else:
         print(f'The model predicts in seconds and the MSE is also calculated in seconds')
-        print(f'Mean Squared Error on Validation Set: {mse_val}')
+        print(f'Mean Squared Error in seconds on Validation Set: {mse_val}')
         print(f'Baseline MSE on Validation Set:       {baseline_mse_val} \n')
         print(f'Mean Squared Error on Test Set: {mse_test}')
         print(f'Baseline MSE on Test Set      : {baseline_mse_test} \n')
