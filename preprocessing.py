@@ -189,6 +189,7 @@ if __name__ == "__main__":
     # Replace NaN values in 'distance' with calculated values
     non_empty_df['interval_afstand'] = non_empty_df['calculated_distance'].combine_first(non_empty_df['interval_afstand'])
     # Add 2k time to seconds column 
+    
     # Select all 2k_times entries and convert to seconds and insert new column into df
     col_two_k = non_empty_df.dropna(how='any', subset=('2k tijd')).loc[:,"2k tijd"]
     col_two_k_sec = col_two_k.apply(time_notation_to_sec)

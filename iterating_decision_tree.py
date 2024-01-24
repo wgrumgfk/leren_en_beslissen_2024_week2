@@ -49,18 +49,12 @@ for iter in range(1, 101):
 
     model_nr = 1
 
-    print('------------------------------')
-    print('Iteration: ', iter)
-    print('Random seed is ', rand_seed)
-    print('\n')
-
     # For every model calculate the val_mse. Store the model with best val_mse.
     # Also print the test_mse for this model.
     for model_feat in [model_feat1, model_feat2, model_feat3, 
                        model_feat4, model_feat5, model_feat6,
                        model_feat7, model_feat8, model_feat9]:
 
-        # print("\n\nModel nr. ", model_nr)
         # Drop all rows if any of the feature data is missing:
         model_feat_df = df.dropna(how = 'any', subset=model_feat, inplace=False)
 

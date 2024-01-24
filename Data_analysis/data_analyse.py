@@ -40,6 +40,21 @@ Kun je omschrijven of er specifieke afwijkingen zijn zoals 'machine' ineens niet
 df = non_empty_df
 
 # GENERAL FUNCTIONS ########################################################################
+def time_notation_to_sec(time_notation):
+    # Check if incoming time_notation is non-empty
+    # time_notation 3 variations; 00:07:30.300 or 07:30.300 07.30.300
+    if isinstance(time_notation, str):
+        time_notation = time_notation.replace(',', '.')
+        split_string = time_notation.split(':')
+        if len(split_string) > 2:   # variant like 00:07:30.300
+            sec = (float(split_string[1]) * 60) +  float(split_string[2])
+        elif len(split_string) == 2:   # variant like 07:30.300
+            sec = (float(split_string[0]) * 60) +  float(split_string[1])
+        else:       # variant like 7:30.300
+            sec = (float(time_notation[0] * 60) + float(time_notation[2:]))
+    else:     # return empty string if empty entry
+        return ''
+    return sec
 
 def entry_to_seconds(entry):
     if pd.isna(entry):
@@ -68,10 +83,13 @@ def entry_to_seconds(entry):
         return minutes * 60 + seconds + little_seconds / 100
     else:
         return minutes * 60 + seconds
+    
+def split_500_to_watt(split):
+    return float(2.8 / (float((split/500) ** 3)))
 
-def seconds_to_wattage(df, column_name):
-    # Apply the process_entry function to the specified column
-    return 2.8 / df[column_name].apply(entry_to_seconds) ** 3
+# Calculate watt from 2k time in seconds.
+def split_2k_to_watt(split):
+    return split_500_to_watt(float(split / 4))
 
 
 def average_split_per_person(dataframe):
@@ -210,22 +228,27 @@ plt.title("2k times per group")
 # plt.show()
 
 # SCATTERPLOTS SORTED BY GENDER, EXPERIENCE AND WEIGHT #############################################
+col_500_split = non_empty_df.dropna(how='any', subset=('500_split')).loc[:,"500_split"]
+col_500_split_sec = col_500_split.apply(time_notation_to_sec)
+non_empty_df.insert(9, "500_split_sec", col_500_split_sec, True)
 
-# calculate the wattage
-df.loc[:, 'wattage']= (
-    seconds_to_wattage(df, '500_split')
-)
+# Add watt column for 500m_split
+col_500_split_sec = non_empty_df.dropna(how='any', subset=('500_split_sec')).loc[:,"500_split_sec"]
+col_500_split_watt = col_500_split_sec.apply(split_500_to_watt)
+non_empty_df.insert(10, "wattage", col_500_split_watt, True)
 
-# divide the 2k time so that it becomes a 500-split
-df['500_split_2k']= df['2k tijd'].apply(entry_to_seconds) / 4
+# Select all 2k_times entries and convert to seconds and insert new column into df
+col_two_k = non_empty_df.dropna(how='any', subset=('2k tijd')).loc[:,"2k tijd"]
+col_two_k_sec = col_two_k.apply(time_notation_to_sec)
+non_empty_df.insert(1, "two_k_tijd_sec", col_two_k_sec, True)
 
-
-df.loc[:, '2k_wattage'] = (
-    2.8 / df['500_split_2k'] ** 3
-)
+# Add watt column for 2k time
+col_two_k_tijd_sec = non_empty_df.dropna(how='any', subset=('two_k_tijd_sec')).loc[:,"two_k_tijd_sec"]
+col_two_k_watt = col_two_k_tijd_sec.apply(split_2k_to_watt)
+non_empty_df.insert(1, "2k_wattage", col_two_k_watt, True)
 
 # Set the threshold
-threshold = 0.001
+threshold = 400
 
 # only keep data below threshold
 filtered_df = df[(df['wattage'] < threshold) & (df['2k_wattage'] < threshold)]
@@ -246,10 +269,12 @@ women_df = women_df.drop_duplicates(subset='naam', keep='first')
 
 # Scatter plot
 plt.figure(figsize=(10, 6))
-sns.regplot(x = "wattage", y = "2k_wattage", data = filtered_df)
-plt.title('Correlation between 500m Split Wattage and 2k Wattage (Under Threshold)')
-plt.xlabel('500m Split Wattage')
-plt.ylabel('2k Wattage')
+sns.scatterplot(x='wattage', y='2k_wattage', hue='geslacht', data=new_df)
+sns.regplot(x = "wattage", y = "2k_wattage", data = new_df, scatter=False)
+# sns.regplot(x = "wattage", y = "2k_wattage", data = new_df)
+plt.title('Correlation between training wattage and 2k wattage')
+plt.xlabel('training wattage')
+plt.ylabel('2k wattage')
 
 plt.legend()
 plt.grid(True)
