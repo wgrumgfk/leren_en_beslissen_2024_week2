@@ -7,34 +7,10 @@ from sklearn import tree
 from sklearn.tree import DecisionTreeRegressor
 import random
 
-# Assume you have a DataFrame named 'df' with your data
-# If your data is in a CSV file, you can read it using:
-
 df = pd.read_csv('okeanos_processed.csv')
 
 all_cols = df.columns.to_list()
 
-# Specify features for every model you wanna compare.
-# Always put to be predicted value as last element in list
-
-model_feat1 = ['500_split_watt', 'two_k_tijd_sec']
-model_feat2 = ['500_split_watt', 'two_k_watt']
-model_feat3 = ['mean_watt_per_training', 'two_k_tijd_sec']
-model_feat4 = ['mean_500_per_training', 'two_k_tijd_sec']
-model_feat5 = ['ervaring', 'mean_500_per_training', 'two_k_tijd_sec']
-model_feat6 = ['ervaring', 'man', 'mean_500_per_training', 'two_k_tijd_sec']
-model_feat7 = ['ervaring', 'man', 'mean_500_per_training', 'calculated_distance', 'two_k_tijd_sec']
-model_feat8 = ['ervaring', 'man', 'mean_500_per_training', 'aantal_intervallen', 'two_k_tijd_sec']
-model_feat9 = ['ervaring', 'man', 'mean_500_per_training', 'interval_nummer_1', 'interval_nummer_2', 'interval_nummer_3',
-               'interval_nummer_4', 'interval_nummer_5', 'interval_nummer_6', 'interval_nummer_7', 'interval_nummer_8', 
-               'interval_nummer_9', 'interval_nummer_avg', 'two_k_tijd_sec']
-#model_feat7 = ['ervaring', 'man', 'mean_500_per_training', 'rust_sec', 'two_k_tijd_sec']
-#model_feat8 = ['ervaring', 'man', 'days_until_2k', 'mean_500_per_training', 'two_k_tijd_sec']
-#model_feat9 = ['ervaring', 'man', 'days_until_2k', 'AT', 'I', 'ID', 'ED', 'mean_500_per_training', 'two_k_tijd_sec']
-#model_feat10 = ['ervaring', 'man', 'days_until_2k', 'AT', 'I', 'ID', 'ED', 'interval_afstand', 'mean_500_per_training', 'two_k_tijd_sec']
-
-#model_feat3 = ['man', 'zwaar', 'AT', 'I', 'ID', 'ED', 'ervaring', 'mean_500_per_training', 'two_k_tijd_sec']
-#model_feat5 = ['man', 'zwaar', 'AT', 'I', 'ID', 'ED', 'ervaring', 'mean_watt_per_training', 'two_k_tijd_sec']
 
 def watt_to_pace(watt):
     if isinstance(watt, float):
@@ -42,19 +18,15 @@ def watt_to_pace(watt):
     
 performance_dict = dict()
 
-#for iter in range(1, 101):
-for iter in range(1, 101):
-    # Initialize mse and model variables.
-    rand_seed = random.randint(0, 100000)
 
-    model_nr = 1
+for iter in range(1, 101):
+    rand_seed = random.randint(0, 100000)
 
     # For every model calculate the val_mse. Store the model with best val_mse.
     # Also print the test_mse for this model.
-    for model_feat in [model_feat1, model_feat2, model_feat3, 
-                       model_feat4, model_feat5, model_feat6,
-                       model_feat7, model_feat8, model_feat9]:
-
+    for depth in (range(1,15)):
+        model_feat= ['days_until_2k','man','zwaar','AT','I','ID','ED','rust_sec','afstand','ervaring','500_split_watt','aantal_intervallen', 'calculated_distance', 'two_k_watt']
+        
         # Drop all rows if any of the feature data is missing:
         model_feat_df = df.dropna(how = 'any', subset=model_feat, inplace=False)
 
@@ -67,71 +39,49 @@ for iter in range(1, 101):
         X_val, X_test, y_val, y_test = train_test_split(X_temp, y_temp, test_size=0.5, random_state=rand_seed)
 
         # Train
-        regr = DecisionTreeRegressor()
+        regr = DecisionTreeRegressor(max_depth=depth)
         regr.fit(X_train, y_train)
 
         # Predict
         y_val_pred = regr.predict(X_val)
         y_train_pred = regr.predict(X_train)
 
-        # validation MSE from wattage to seconds if predicted in watt
-        if model_feat[-1] == 'two_k_watt':
-            y_val_pred_sec = numpy.array([watt_to_pace(x) for x in y_val_pred])
-            y_val_sec = numpy.array([watt_to_pace(x) for x in y_val])
-            mse_val_sec = mean_squared_error(y_val_sec, y_val_pred_sec)
-
-        # Evaluate the model on the validation set. 
-        mse_val = mean_squared_error(y_val, y_val_pred)
-
-        # test MSE from wattage to seconds if predicted in watt
-        if model_feat[-1] == 'two_k_watt':
-            y_val_pred = numpy.array([watt_to_pace(x) for x in y_val_pred])
-            y_val = numpy.array([watt_to_pace(x) for x in y_val])
-            mse_test_sec = mean_squared_error(y_val, y_val_pred)
-
-        # test MSE if prediction was in seconds
-        mse_test = mean_squared_error(y_val, y_val_pred)
         
-        # Calculate the baseline mean 2k time for y_train 
+        
         baseline_prediction = sum(y_train)/len(y_train)
-        # If prediction in watt, calculate seconds for the predicted wattage
-        if model_feat[-1] == 'two_k_watt':
-            y_train_sec = numpy.array([watt_to_pace(x) for x in y_train])
-            baseline_prediction= (sum(y_train_sec))/len(y_train)
 
+        # Evaluate validation
+        y_val_pred = numpy.array([watt_to_pace(x) for x in y_val_pred])
+        y_val = numpy.array([watt_to_pace(x) for x in y_val])
+        mse_val = mean_squared_error(y_val, y_val_pred)
+        baseline_mse_val = mean_squared_error(numpy.array([baseline_prediction for _ in range(len(y_val))]), y_val)
 
-        baseline_mse_val = mean_squared_error(numpy.array([baseline_prediction for i in range(len(y_val))]), y_val)
-        baseline_mse_test = mean_squared_error(numpy.array([baseline_prediction for i in range(len(y_test))]), y_test)
+        # Evaluate training
+        y_train_pred = numpy.array([watt_to_pace(x) for x in y_train_pred])
+        y_train = numpy.array([watt_to_pace(x) for x in y_train])
+        mse_train = mean_squared_error(y_train, y_train_pred)
+        baseline_mse_train = mean_squared_error(numpy.array([baseline_prediction for _ in range(len(y_train))]), y_train)
         
 
         if iter == 1:
-            if model_feat[-1] == 'two_k_watt':
-                performance_dict[model_nr] = [[mse_val_sec], [baseline_mse_val], [mse_test_sec], [baseline_mse_test], [len(model_feat_df), model_feat]]
-            else:
-                performance_dict[model_nr] = [[mse_val], [baseline_mse_val], [mse_test], [baseline_mse_test], [len(model_feat_df), model_feat]]
+            performance_dict[depth] = [[mse_val], [baseline_mse_val], [mse_val], [baseline_mse_val], [len(model_feat_df), model_feat]]
         else:
             if model_feat[-1] == 'two_k_watt':
-                performance_dict[model_nr][0].append(mse_val_sec)
-                performance_dict[model_nr][2].append(mse_test_sec)
-            else:
-                performance_dict[model_nr][0].append(mse_val)
-                performance_dict[model_nr][2].append(mse_test)
-
-            performance_dict[model_nr][1].append(baseline_mse_val)
-            performance_dict[model_nr][3].append(baseline_mse_test)
+                performance_dict[depth][0].append(mse_val)
+                performance_dict[depth][2].append(mse_train)
+            performance_dict[depth][1].append(baseline_mse_val)
+            performance_dict[depth][3].append(baseline_mse_train)
 
         # Print the coefficients of the model
         #coefficients = pd.DataFrame({'Feature': X.columns, 'Coefficient': linear_reg_model.coef_})
         #print(coefficients)
-
-        model_nr += 1
 
 print('\n-------------------------')
 print('Model training and predicting done.\n')
 print("Printing model performances for ", iter, " iterations...\n")
 
 for k,v in performance_dict.items():
-    print("Model nr :", k)
+    print("Depth :", k)
     print("Features : ", v[4][1][:-1])
     print("Amount of rows remaining after dropna : ", v[4][0])
     if v[4][1][-1] == 'two_k_watt':
@@ -140,8 +90,8 @@ for k,v in performance_dict.items():
         print(f'The model predicts in seconds and the MSE is also calculated in seconds')
     print("MSE valid          :", sum(v[0])/len(v[0]))
     print("Baseline MSE valid :", sum(v[1])/len(v[1]))
-    print("MSE test           :", sum(v[2])/len(v[2]))
-    print("Baseline MSE test  :", sum(v[3])/len(v[3]))
+    print("MSE train           :", sum(v[2])/len(v[2]))
+    print("Baseline MSE train  :", sum(v[3])/len(v[3]))
     print("\n")
 
 """

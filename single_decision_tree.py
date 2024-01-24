@@ -1,4 +1,5 @@
 from sklearn import tree
+from matplotlib import pyplot as plt
 import pandas as pd
 import numpy
 from sklearn.metrics import mean_squared_error
@@ -6,8 +7,8 @@ from sklearn.model_selection import train_test_split
 from sklearn import tree
 from sklearn.tree import DecisionTreeRegressor
 
-regressor = False
-wattage = False
+regressor = True
+wattage = True
 
 def watt_to_pace(watt):
     # if isinstance(watt, int):
@@ -35,8 +36,8 @@ X_val, X_test, y_val, y_test = train_test_split(X_temp, y_temp, test_size=0.5, r
 # REGRESSOR #################################################################################################
 if regressor == True:
     # Train
-    regr = DecisionTreeRegressor()
-    regr.fit(X_train, y_train)
+    regr = DecisionTreeRegressor(max_depth=3)
+    regr = regr.fit(X_train, y_train)
 
     # Predict
     y_val_pred = regr.predict(X_val)
@@ -88,3 +89,11 @@ if regressor == False:
     print("MSE train class:", mse_train)
     mse_test = mean_squared_error(y_val, y_val_pred)
     print("MSE val class:", mse_test)
+
+
+fig = plt.figure(figsize=(25,20))
+_ = tree.plot_tree(regr, 
+                   feature_names= feature_cols,  
+                #    class_names=df.target_names,
+                   filled=True)
+plt.show()
