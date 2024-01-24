@@ -1,8 +1,12 @@
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LinearRegression
 from sklearn.metrics import mean_squared_error
+from sklearn.metrics import mean_absolute_error, r2_score
+from sklearn import metrics
 import pandas as pd
 import numpy
+import matplotlib.pyplot as plt
+import statsmodels.api as sm
 
 # Assume you have a DataFrame named 'df' with your data
 # If your data is in a CSV file, you can read it using:
@@ -88,13 +92,25 @@ for model_feat in [model_feat1, model_feat2, model_feat3]:
         baseline_mse_val = mean_squared_error(numpy.array([baseline_pred for i in range(len(y_val_pred))]), y_val)
         baseline_mse_test = mean_squared_error(numpy.array([baseline_pred for i in range(len(y_test_pred))]), y_test)
 
+    r_squared_val_sec = r2_score(y_val_sec, y_val_pred_sec)
+
+    n = len(y_val_sec)
+    k = len(model_feat) - 1  # Number of predictors
+    adjusted_r_squared_val_sec = 1 - ((1 - r_squared_val_sec) * (n - 1) / (n - k - 1))
+
+
     # print statements
     if model_feat[-1] == 'two_k_watt':
         print(f'The model predicts in wattage but the MSE is calculated in seconds')
-        print(f'Mean Squared Error in seconds on Validation Set: {mse_val_sec}')
-        print(f'Baseline MSE in seconds on Validation Set:       {baseline_mse_val_sec}\n')
-        print(f'Mean Squared Error in seconds on Test Set: {mse_test_sec}')
-        print(f'Baseline MSE in seconds on Test Set      : {baseline_mse_test_sec}\n')
+        print(f'Mean Squared Error on Validation Set with seconds: {mse_val_sec}')
+        print(f'Baseline MSE on Validation Set with seconds:       {baseline_mse_val_sec}\n')
+        print(f'Mean Squared Error on Test Set with seconds: {mse_test_sec}')
+        print(f'Baseline MSE on Test Set with seconds     : {baseline_mse_test_sec}\n')
+        print("Mean absolute error validation:",mean_absolute_error(y_val_sec, y_val_pred_sec))
+        print("Mean absolute error test:",mean_absolute_error(y_test_sec, y_test_pred_sec))
+        print("R-squared :",r_squared_val_sec)
+        print("Adjusted R squared val", adjusted_r_squared_val_sec)
+        print("R-squared :",r2_score(y_test_sec, y_test_pred_sec))
     else:
         print(f'The model predicts in seconds and the MSE is also calculated in seconds')
         print(f'Mean Squared Error in seconds on Validation Set: {mse_val}')
@@ -103,9 +119,35 @@ for model_feat in [model_feat1, model_feat2, model_feat3]:
         print(f'Baseline MSE on Test Set      : {baseline_mse_test} \n')
 
 
+    residuals_val_sec = y_val_sec - y_val_pred_sec
+    residuals_test_sec = y_test - y_test_pred
+
+
+
     # Print the coefficients of the model
     coefficients = pd.DataFrame({'Feature': X.columns, 'Coefficient': linear_reg_model.coef_})
     print(coefficients)
+
+    #Residual Analysis
+    # Scatter plot of residuals against predicted values
+
+    plt.scatter(y_val_pred_sec, residuals_val_sec)
+    plt.title("Residuals vs. Fitted Values (Validation Set)")
+    plt.xlabel("Fitted Values")
+    plt.ylabel("Residuals")
+    plt.show()
+
+    # Histogram of residuals
+    plt.hist(residuals_val_sec, bins=20)
+    plt.title("Histogram of Residuals (Validation Set)")
+    plt.xlabel("Residuals")
+    plt.ylabel("Frequency")
+    plt.show()
+
+    # Q-Q plot of residuals
+    sm.qqplot(residuals_val_sec, line='45')
+    plt.title("Q-Q Plot of Residuals (Validation Set)")
+    plt.show()
 
     model_nr += 1
 
