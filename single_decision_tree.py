@@ -1,14 +1,13 @@
 from sklearn import tree
 import pandas as pd
 import numpy
-from sklearn import metrics
 from sklearn.metrics import mean_squared_error
 from sklearn.model_selection import train_test_split
 from sklearn import tree
 from sklearn.tree import DecisionTreeRegressor
 
 regressor = False
-wattage = True
+wattage = False
 
 def watt_to_pace(watt):
     # if isinstance(watt, int):
@@ -63,9 +62,6 @@ if regressor == False:
     y_train = y_train.multiply(10).astype(int)
     y_val = y_val.multiply(10).astype(int)
 
-    print(y_train)
-    print(y_val)
-
     # Train
     clf = tree.DecisionTreeClassifier()
     clf = clf.fit(X_train, y_train)
@@ -74,22 +70,16 @@ if regressor == False:
     y_train_pred = clf.predict(X_train)
     y_val_pred = clf.predict(X_val)
 
+    y_train = y_train * .1
+    y_train_pred = y_train_pred * .1
+    y_val = y_val * .1
+    y_val_pred = y_val_pred * .1
+    
     if wattage == True:
-        y_train = y_train * .1
-        y_train_pred = y_train_pred * .1
-        y_val = y_val * .1
-        y_val_pred = y_val_pred * .1
-        y_train_pred = numpy.array([watt_to_pace(x) for x in y_train_pred])
-        y_train = numpy.array([watt_to_pace(x) for x in y_train])
-
         y_val_pred = numpy.array([watt_to_pace(x) for x in y_val_pred])
-        y_val = numpy.array([watt_to_pace(x) for x in y_val])
-
-    else:
-        y_train = y_train * .1
-        y_train_pred = y_train_pred * .1
-        y_val = y_val * .1
-        y_val_pred = y_val_pred * .1
+        y_val = numpy.array([watt_to_pace(x) for x in y_val.iloc[:, 0]])
+        y_train_pred = numpy.array([watt_to_pace(x) for x in y_train_pred])
+        y_train = numpy.array([watt_to_pace(x) for x in y_train.iloc[:, 0]])
 
     # Evaluate
     print(y_val)
@@ -98,7 +88,3 @@ if regressor == False:
     print("MSE train class:", mse_train)
     mse_test = mean_squared_error(y_val, y_val_pred)
     print("MSE val class:", mse_test)
-
-    # This doesn't work yet for some reason
-    # print("Accuracy train:",metrics.accuracy_score(y_train, y_train_pred))
-    # print("Accuracy val:",metrics.accuracy_score(y_val, y_val_pred))
