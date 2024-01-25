@@ -44,13 +44,13 @@ for iter in range(1, 1001):
     y_train_pred = regr.predict(X_train)
 
     # Option 1: convert back to seconds
-    y_train_pred = numpy.array([watt_to_pace(x) * 4 for x in y_train_pred])
-    y_train = numpy.vectorize(watt_to_pace)(y_train) * 4
+    y_train_pred = numpy.array([watt_to_pace(x) for x in y_train_pred])
+    y_train = numpy.vectorize(watt_to_pace)(y_train) 
 
-    y_val_pred = numpy.array([watt_to_pace(x) * 4 for x in y_val_pred])
-    y_val = numpy.vectorize(watt_to_pace)(y_val) * 4
+    y_val_pred = numpy.array([watt_to_pace(x) for x in y_val_pred])
+    y_val = numpy.vectorize(watt_to_pace)(y_val) 
 
-    threshold = 25
+    threshold = 10
 
     good = 0
     for i in range(len(y_val)):

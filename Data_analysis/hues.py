@@ -105,13 +105,13 @@ new_df = new_df.drop_duplicates(subset='naam', keep='first')
 
 # Scatter plot
 plt.figure(figsize=(10, 6))
-sns.scatterplot(x='wattage', y='2k_wattage', hue='gewichtsklasse', data=new_df)
+sns.scatterplot(x='wattage', y='2k_wattage', hue='zone', data=new_df)
 sns.regplot(x = "wattage", y = "2k_wattage", data = new_df, scatter=False)
 # sns.regplot(x = "wattage", y = "2k_wattage", data = new_df)
-plt.title('Correlation between training wattage and 2k wattage')
+plt.title('Correlation between training wattage and 2k wattage (Man)')
 plt.xlabel('training wattage')
 plt.ylabel('2k wattage')
 
-plt.legend(title='Weight class')
+plt.legend(title='zone')
 plt.grid(True)
 plt.show()

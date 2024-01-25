@@ -7,6 +7,7 @@ import pandas as pd
 import numpy
 import matplotlib.pyplot as plt
 import statsmodels.api as sm
+from statistics import mean
 
 # Assume you have a DataFrame named 'df' with your data
 # If your data is in a CSV file, you can read it using:
@@ -122,20 +123,31 @@ for model_feat in [model_feat1, model_feat2, model_feat3]:
     residuals_val_sec = y_val_sec - y_val_pred_sec
     residuals_test_sec = y_test - y_test_pred
 
+    threshold = 10
+    ACC = []
+
+    good = 0
+    for i in range(len(y_val)):
+        if abs(y_test_sec[i] - y_test_pred_sec[i]) < threshold:
+            good += 1
+
+    ACC.append(good / len(y_val))
+    print('accuracy with threshold of', threshold, ':', mean(ACC))
+
 
 
     # Print the coefficients of the model
     coefficients = pd.DataFrame({'Feature': X.columns, 'Coefficient': linear_reg_model.coef_})
     print(coefficients)
 
-    #Residual Analysis
-    # Scatter plot of residuals against predicted values
+    # #Residual Analysis
+    # # Scatter plot of residuals against predicted values
 
-    plt.scatter(y_val_pred_sec, residuals_val_sec)
-    plt.title("Residuals vs. Fitted Values (Validation Set)")
-    plt.xlabel("Fitted Values")
-    plt.ylabel("Residuals")
-    plt.show()
+    # plt.scatter(y_val_pred_sec, residuals_val_sec)
+    # plt.title("Residuals vs. Fitted Values (Validation Set)")
+    # plt.xlabel("Fitted Values")
+    # plt.ylabel("Residuals")
+    # plt.show()
 
     # Histogram of residuals
     plt.hist(residuals_val_sec, bins=20)
@@ -144,10 +156,10 @@ for model_feat in [model_feat1, model_feat2, model_feat3]:
     plt.ylabel("Frequency")
     plt.show()
 
-    # Q-Q plot of residuals
-    sm.qqplot(residuals_val_sec, line='45')
-    plt.title("Q-Q Plot of Residuals (Validation Set)")
-    plt.show()
+    # # Q-Q plot of residuals
+    # sm.qqplot(residuals_val_sec, line='45')
+    # plt.title("Q-Q Plot of Residuals (Validation Set)")
+    # plt.show()
 
     model_nr += 1
 
