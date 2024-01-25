@@ -21,7 +21,12 @@ model_feat3 = ['500_split_watt', 'two_k_tijd_sec']
 model_feat4 = ['500_split_watt', 'two_k_watt']
 model_feat5 = ['500_split_sec', 'calculated_distance' , 'two_k_tijd_sec']
 model_feat6 = ['500_split_sec', 'calculated_distance' , 'man', 'two_k_tijd_sec']
-model_feat7 = ['calculated_distance' , 'mean_500_per_training', 'two_k_tijd_sec']
+#model_feat7 = ['calculated_distance' , 'mean_500_per_training', 'two_k_tijd_sec']
+model_feat7 = ['ervaring', 'man', 'days_until_2k', 'AT', 'I', 'ID', 'ED', 'calculated_distance', 'mean_500_per_training', 'two_k_tijd_sec']
+model_feat8 = ['ervaring', 'man', 'days_until_2k', 'AT', 'I', 'ID', 'ED', 'calculated_distance', 'mean_500_per_training', '500_split_sec', 'two_k_tijd_sec']
+model_feat9 = ['ervaring', 'man', 'days_until_2k', 'AT', 'I', 'ID', 'ED', 'calculated_distance', 'mean_500_per_training', '500_split_sec', 'aantal_intervallen', 'two_k_tijd_sec']
+model_feat10 = ['ervaring', 'man', 'days_until_2k', 'AT', 'I', 'ID', 'ED', 'calculated_distance', 'mean_500_per_training', '500_split_sec', 'two_k_tijd_sec']
+
 #model_feat3 = ['mean_watt_per_training', 'two_k_tijd_sec']
 #model_feat4 = ['mean_500_per_training', 'two_k_tijd_sec']
 #model_feat5 = ['ervaring', 'mean_500_per_training', 'two_k_tijd_sec']
@@ -42,7 +47,7 @@ model_feat7 = ['calculated_distance' , 'mean_500_per_training', 'two_k_tijd_sec'
 performance_list = []
 
 #for iter in range(1, 101):
-for iter in range(1, 501):
+for iter in range(1, 101):
     # Initialize mse and model variables.
     rand_seed = random.randint(0, 100000)
     #rand_seed = 7
@@ -56,8 +61,8 @@ for iter in range(1, 501):
     # Also print the test_mse for this model.
     for model_feat in [model_feat1, model_feat2, model_feat3, 
                        model_feat4, model_feat5, model_feat6,
-                       model_feat7]:# model_feat6,
-                       #model_feat7, model_feat8, model_feat9]:
+                       model_feat7, model_feat8, model_feat9,
+                       model_feat10]:# model_feat8, model_feat9]:
 
         #print("\n\nModel nr. ", model_nr)
         # Drop all rows if any of the feature data is missing:
@@ -90,11 +95,14 @@ for iter in range(1, 501):
             y_val_pred_sec = numpy.array([watt_to_pace(x) for x in y_val_pred])
             y_val_sec = numpy.array([watt_to_pace(x) for x in y_val])
             mse_val_sec = mean_squared_error(y_val_sec, y_val_pred_sec)
+            mae_val_sec = (sum(abs(y_val_sec - y_val_pred_sec)) / len(abs(y_val_sec - y_val_pred_sec)))
 
         # Evaluate the model on the validation set. 
         mse_val = mean_squared_error(y_val, y_val_pred)
-       
+        # Absolute afstand
+        mae_val = (sum(abs(y_val - y_val_pred)) / len(abs(y_val - y_val_pred)))
         
+        #print(mae_val)
         #mse_val_sec = mean_squared_error(y_val_sec, y_val_pred_sec)
         #print(f'Mean Squared Error on Validation Set: {mse_val}')
 
@@ -106,10 +114,11 @@ for iter in range(1, 501):
             y_test_pred_sec = numpy.array([watt_to_pace(x) for x in y_test_pred])
             y_test_sec = numpy.array([watt_to_pace(x) for x in y_test])
             mse_test_sec = mean_squared_error(y_test_sec, y_test_pred_sec)
+            mae_test_sec = (sum(abs(y_test_sec - y_test_pred_sec)) / len(abs(y_test_sec - y_test_pred_sec)))
 
         # test MSE if prediction was in seconds
         mse_test = mean_squared_error(y_test, y_test_pred)
-        
+        mae_test = (sum(abs(y_test - y_test_pred)) / len(abs(y_test - y_test_pred)))
         # Calculate the baseline mean 2k time for y_train 
 
         # If prediction in watt, calculate seconds for the predicted wattage
@@ -118,18 +127,28 @@ for iter in range(1, 501):
             baseline_prediction_1 = (sum(y_train_sec))/len(y_train)
             baseline_mse_val_sec = mean_squared_error(numpy.array([baseline_prediction_1 for i in range(len(y_val_pred_sec))]), y_val_sec)
             baseline_mse_test_sec = mean_squared_error(numpy.array([baseline_prediction_1 for i in range(len(y_test_pred_sec))]), y_test_sec)
-           
+            baseline_mae_val_sec = ((sum(abs([baseline_prediction_1 for i in range(len(y_val_pred_sec))] - y_val_sec))) / 
+                                    len((abs([baseline_prediction_1 for i in range(len(y_val_pred_sec))] - y_val_sec))))
+            baseline_mae_test_sec = ((sum(abs([baseline_prediction_1 for i in range(len(y_test_pred_sec))] - y_test_sec))) / 
+                                    len((abs([baseline_prediction_1 for i in range(len(y_test_pred_sec))] - y_test_sec))))
         else:
             baseline_prediction = sum(y_train)/len(y_train)
             baseline_mse_val = mean_squared_error(numpy.array([baseline_prediction for i in range(len(y_val))]), y_val)
             baseline_mse_test = mean_squared_error(numpy.array([baseline_prediction for i in range(len(y_test))]), y_test)
-
+            baseline_mae_val = ((sum(abs([baseline_prediction for i in range(len(y_val))] - y_val))) / 
+                                    len((abs([baseline_prediction for i in range(len(y_val))] - y_val))))
+            baseline_mae_test = ((sum(abs([baseline_prediction for i in range(len(y_test))] - y_test))) / 
+                                    len((abs([baseline_prediction for i in range(len(y_test))] - y_test))))
         #print('Dit is model_nr ', model_nr)
         if iter == 1:
             if model_feat[-1] == 'two_k_watt':
-                performance_list.append([[mse_val_sec], [baseline_mse_val_sec], [mse_test_sec], [baseline_mse_test_sec], [len(model_feat_df), model_feat], model_nr])
+                performance_list.append([[mse_val_sec], [baseline_mse_val_sec], [mse_test_sec], [baseline_mse_test_sec],
+                                        [len(model_feat_df), model_feat], model_nr, [[mae_val_sec], [baseline_mae_val_sec], 
+                                                                                      [mae_test_sec], [baseline_mae_test_sec]]])
             else:
-                performance_list.append([[mse_val], [baseline_mse_val], [mse_test], [baseline_mse_test], [len(model_feat_df), model_feat], model_nr])
+                performance_list.append([[mse_val], [baseline_mse_val], [mse_test], [baseline_mse_test], 
+                                         [len(model_feat_df), model_feat], model_nr, [[mae_val],  [baseline_mae_val], 
+                                                                                       [mae_test], [baseline_mse_test]]])
             print("Iter == 1 nu is performance list dit:\n", performance_list)
         else:
             if model_feat[-1] == 'two_k_watt':
@@ -137,11 +156,19 @@ for iter in range(1, 501):
                 performance_list[model_nr - 1][2].append(mse_test_sec)
                 performance_list[model_nr - 1][1].append(baseline_mse_val_sec)
                 performance_list[model_nr - 1][3].append(baseline_mse_test_sec)
+                performance_list[model_nr - 1][6][0].append(mae_val_sec)
+                performance_list[model_nr - 1][6][1].append(baseline_mae_val_sec)
+                performance_list[model_nr - 1][6][2].append(mae_test_sec)
+                performance_list[model_nr - 1][6][3].append(baseline_mae_test_sec)
             else:
                 performance_list[model_nr - 1][0].append(mse_val)
                 performance_list[model_nr - 1][2].append(mse_test)
                 performance_list[model_nr - 1][1].append(baseline_mse_val)
                 performance_list[model_nr - 1][3].append(baseline_mse_test)
+                performance_list[model_nr - 1][6][0].append(mae_val)
+                performance_list[model_nr - 1][6][1].append(baseline_mae_val)
+                performance_list[model_nr - 1][6][2].append(mae_test)
+                performance_list[model_nr - 1][6][3].append(baseline_mae_test)
 
         # Print the coefficients of the model
         #coefficients = pd.DataFrame({'Feature': X.columns, 'Coefficient': linear_reg_model.coef_})
@@ -156,7 +183,7 @@ print("Printing model performances for ", iter, " iterations...\n")
 #print("KIJK: \n", performance_list[0][])
 
 for model_list in performance_list:
-    print("Model nr : ", model_list[-1])
+    print("Model nr : ", model_list[5])
     print("Features : ", model_list[4][1][:-1])
     print("Amount of rows remaining after dropna : ", model_list[4][0])
     if model_list[4][1][-1] == 'two_k_watt':
@@ -164,9 +191,13 @@ for model_list in performance_list:
     else:
         print(f'The model predicts in seconds and the MSE is also calculated in seconds')
     print("MSE valid          :", sum(model_list[0])/len(model_list[0]))
+    print("MAE valid          :", sum(model_list[6][0])/len(model_list[6][0]))
     print("Baseline MSE valid :", sum(model_list[1])/len(model_list[1]))
+    print("Baseline MAE valid :", sum(model_list[6][1])/len(model_list[6][1]))
     print("MSE test           :", sum(model_list[2])/len(model_list[2]))
+    print("MAE test           :", sum(model_list[6][2])/len(model_list[6][2]))
     print("Baseline MSE test  :", sum(model_list[3])/len(model_list[3]))
+    print("Baseline MAE test  :", sum(model_list[6][3])/len(model_list[6][3]))
     print("\n")
 
 """
