@@ -213,6 +213,7 @@ print("Printing model performances for ", iter, " iterations...\n")
 #print("KIJK: \n", performance_list[0][])
 
 for model_list in performance_list:
+    print('--------------------------')
     print("Model nr : ", model_list[5])
     print("Features : ", model_list[4][1][:-1])
     print("Amount of rows remaining after dropna : ", model_list[4][0])
@@ -220,6 +221,7 @@ for model_list in performance_list:
         print(f'The model predicts in wattage but the MSE is calculated in seconds')
     else:
         print(f'The model predicts in seconds and the MSE is also calculated in seconds')
+    print('\nVALIDATION set:')
     print("MSE valid          :", sum(model_list[0])/len(model_list[0]))
     print("MAE valid          :", sum(model_list[6][0])/len(model_list[6][0]))
     for i in range(len(acc_thresholds)):
@@ -228,7 +230,8 @@ for model_list in performance_list:
             temp_acc += model_list[7][j][i]
         
         print("Accuracy valid within range ", acc_thresholds[i], " seconds: ", temp_acc/iterations)
-
+    
+    print('\nBASELINE VALIDATION:')
     print("Baseline MSE valid :", sum(model_list[1])/len(model_list[1]))
     print("Baseline MAE valid :", sum(model_list[6][1])/len(model_list[6][1]))
     for i in range(len(acc_thresholds)):
@@ -238,6 +241,7 @@ for model_list in performance_list:
         
         print("Accuracy baseline valid within range ", acc_thresholds[i], " seconds: ", temp_acc/iterations)
 
+    print('\nTEST set:')
     print("MSE test           :", sum(model_list[2])/len(model_list[2]))
     print("MAE test           :", sum(model_list[6][2])/len(model_list[6][2]))
     for i in range(len(acc_thresholds)):
@@ -247,6 +251,7 @@ for model_list in performance_list:
         
         print("Accuracy test within range ", acc_thresholds[i], "seconds: ", temp_acc/iterations)
 
+    print('\nBASELINE TEST:')
     print("Baseline MSE test  :", sum(model_list[3])/len(model_list[3]))
     print("Baseline MAE test  :", sum(model_list[6][3])/len(model_list[6][3]))
     for i in range(len(acc_thresholds)):
