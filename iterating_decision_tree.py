@@ -46,22 +46,20 @@ for iter in range(1, 101):
         y_val_pred = regr.predict(X_val)
         y_train_pred = regr.predict(X_train)
 
-        
-        
         baseline_prediction = sum(y_train)/len(y_train)
 
         # Evaluate validation
-        y_val_pred = numpy.array([watt_to_pace(x) for x in y_val_pred])
-        y_val = numpy.array([watt_to_pace(x) for x in y_val])
+        y_val_pred = numpy.array([watt_to_pace(x) * 4 for x in y_val_pred])
+        y_val = numpy.array([watt_to_pace(x) * 4 for x in y_val])
         mse_val = mean_squared_error(y_val, y_val_pred)
-        baseline_mse_val = mean_squared_error(numpy.array([baseline_prediction for _ in range(len(y_val))]), y_val)
+        baseline_mse_val = mean_squared_error(numpy.array([watt_to_pace(baseline_prediction) for _ in range(len(y_val))])  * 4, y_val)
 
         # Evaluate training
-        y_train_pred = numpy.array([watt_to_pace(x) for x in y_train_pred])
-        y_train = numpy.array([watt_to_pace(x) for x in y_train])
+        y_train_pred = numpy.array([watt_to_pace(x)* 4 for x in y_train_pred])
+        y_train = numpy.array([watt_to_pace(x) * 4 for x in y_train])
         mse_train = mean_squared_error(y_train, y_train_pred)
-        baseline_mse_train = mean_squared_error(numpy.array([baseline_prediction for _ in range(len(y_train))]), y_train)
-        
+        baseline_mse_train = mean_squared_error(numpy.array([watt_to_pace(baseline_prediction) * 4 for _ in range(len(y_train))]), y_train)
+    
 
         if iter == 1:
             performance_dict[depth] = [[mse_val], [baseline_mse_val], [mse_val], [baseline_mse_val], [len(model_feat_df), model_feat]]
