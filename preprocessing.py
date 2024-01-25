@@ -42,7 +42,8 @@ def time_to_distance(row):
         elif row['interval_tijd'] == 'xx60' or row['interval_tijd'] == '60/60'  or row['interval_tijd'] == 'xx40'  or row['interval_tijd'] == 'xx480':
             return None
         else:
-            return float(row['interval_tijd']) / (float(row['500_split_sec']) * 2)
+            #return float(row['interval_tijd']) / (float(row['500_split_sec']) * 2)    hoezo 2??
+            return (float(row['interval_tijd']) / (float(row['500_split_sec'])) * 500)
     else:
         return row['interval_afstand']
 
