@@ -122,7 +122,7 @@ for model_feat in [model_feat1, model_feat2, model_feat3]:
 
     residuals_val_sec = y_val_sec - y_val_pred_sec
     residuals_test_sec = y_test - y_test_pred
-
+########################## Residual analysis
     threshold = 10
     ACC = []
 
@@ -133,7 +133,7 @@ for model_feat in [model_feat1, model_feat2, model_feat3]:
 
     ACC.append(good / len(y_val))
     print('accuracy with threshold of', threshold, ':', mean(ACC))
-
+##########################################
 
 
     # Print the coefficients of the model

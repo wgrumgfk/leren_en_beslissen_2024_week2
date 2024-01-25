@@ -15,39 +15,19 @@ all_cols = df.columns.to_list()
 # Specify features for every model you wanna compare.
 # Always put to be predicted value as last element in list
 
-model_feat1 = ['500_split_sec', 'two_k_tijd_sec']
-model_feat2 = ['500_split_sec', 'two_k_watt']
-model_feat3 = ['500_split_watt', 'two_k_tijd_sec']
-model_feat4 = ['500_split_watt', 'two_k_watt']
-model_feat5 = ['500_split_sec', 'calculated_distance' , 'two_k_tijd_sec']
-model_feat6 = ['500_split_sec', 'calculated_distance' , 'man', 'two_k_tijd_sec']
-#model_feat7 = ['calculated_distance' , 'mean_500_per_training', 'two_k_tijd_sec']
-model_feat7 = ['ervaring', 'man', 'days_until_2k', 'AT', 'I', 'ID', 'ED', 'calculated_distance', 'mean_500_per_training', 'two_k_tijd_sec']
-model_feat8 = ['ervaring', 'man', 'days_until_2k', 'AT', 'I', 'ID', 'ED', 'calculated_distance', 'mean_500_per_training', '500_split_sec', 'two_k_tijd_sec']
-model_feat9 = ['ervaring', 'man', 'days_until_2k', 'AT', 'I', 'ID', 'ED', 'calculated_distance', 'mean_500_per_training', '500_split_sec', 'aantal_intervallen', 'two_k_tijd_sec']
-model_feat10 = ['ervaring', 'man', 'days_until_2k', 'AT', 'I', 'ID', 'ED', 'calculated_distance', 'mean_500_per_training', '500_split_sec', 'two_k_tijd_sec']
-
-#model_feat3 = ['mean_watt_per_training', 'two_k_tijd_sec']
-#model_feat4 = ['mean_500_per_training', 'two_k_tijd_sec']
-#model_feat5 = ['ervaring', 'mean_500_per_training', 'two_k_tijd_sec']
-#model_feat6 = ['ervaring', 'man', 'mean_500_per_training', 'two_k_tijd_sec']
-#model_feat7 = ['ervaring', 'man', 'mean_500_per_training', 'calculated_distance', 'two_k_tijd_sec']
-#model_feat8 = ['ervaring', 'man', 'mean_500_per_training', 'aantal_intervallen', 'two_k_tijd_sec']
-#model_feat9 = ['ervaring', 'man', 'mean_500_per_training', 'interval_nummer_1', 'interval_nummer_2', 'interval_nummer_3',
-#               'interval_nummer_4', 'interval_nummer_5', 'interval_nummer_6', 'interval_nummer_7', 'interval_nummer_8', 
-#               'interval_nummer_9', 'interval_nummer_avg', 'two_k_tijd_sec']
-#model_feat7 = ['ervaring', 'man', 'mean_500_per_training', 'rust_sec', 'two_k_tijd_sec']
-#model_feat8 = ['ervaring', 'man', 'days_until_2k', 'mean_500_per_training', 'two_k_tijd_sec']
-#model_feat9 = ['ervaring', 'man', 'days_until_2k', 'AT', 'I', 'ID', 'ED', 'mean_500_per_training', 'two_k_tijd_sec']
-#model_feat10 = ['ervaring', 'man', 'days_until_2k', 'AT', 'I', 'ID', 'ED', 'interval_afstand', 'mean_500_per_training', 'two_k_tijd_sec']
-
-#model_feat3 = ['man', 'zwaar', 'AT', 'I', 'ID', 'ED', 'ervaring', 'mean_500_per_training', 'two_k_tijd_sec']
-#model_feat5 = ['man', 'zwaar', 'AT', 'I', 'ID', 'ED', 'ervaring', 'mean_watt_per_training', 'two_k_tijd_sec']
+model_feat1 = ['mean_500_per_training', 'two_k_tijd_sec']
+model_feat2 = ['mean_500_per_training', 'man', 'two_k_tijd_sec']
+model_feat3 = ['mean_500_per_training', 'man', 'ervaring', 'two_k_tijd_sec']
+model_feat4 = ['mean_500_per_training', 'man', 'ervaring', 'zwaar', 'two_k_tijd_sec']
+model_feat5 = ['mean_500_per_training', 'man', 'ervaring', 'zwaar', 'days_until_2k', 'two_k_tijd_sec']
+model_feat6 = ['mean_500_per_training', 'man', 'ervaring', 'zwaar', 'days_until_2k', 'AT', 'I', 'ID', 'ED', 'two_k_tijd_sec']
+model_feat7 = ['mean_500_per_training', 'man', 'ervaring', 'zwaar', 'days_until_2k', 'AT', 'I', 'ID', 'ED', 'calculated_distance', 'two_k_tijd_sec']
+model_feat8 = ['mean_500_per_training', 'man', 'ervaring', 'zwaar', 'days_until_2k', 'AT', 'I', 'ID', 'ED', 'calculated_distance', '500_split_sec', 'mean_watt_per_training','two_k_tijd_sec']
 
 performance_list = []
 
 #for iter in range(1, 101):
-for iter in range(1, 101):
+for iter in range(1, 2001):
     # Initialize mse and model variables.
     rand_seed = random.randint(0, 100000)
     #rand_seed = 7
@@ -61,8 +41,7 @@ for iter in range(1, 101):
     # Also print the test_mse for this model.
     for model_feat in [model_feat1, model_feat2, model_feat3, 
                        model_feat4, model_feat5, model_feat6,
-                       model_feat7, model_feat8, model_feat9,
-                       model_feat10]:# model_feat8, model_feat9]:
+                       model_feat7, model_feat8]:
 
         #print("\n\nModel nr. ", model_nr)
         # Drop all rows if any of the feature data is missing:
@@ -149,7 +128,6 @@ for iter in range(1, 101):
                 performance_list.append([[mse_val], [baseline_mse_val], [mse_test], [baseline_mse_test], 
                                          [len(model_feat_df), model_feat], model_nr, [[mae_val],  [baseline_mae_val], 
                                                                                        [mae_test], [baseline_mse_test]]])
-            print("Iter == 1 nu is performance list dit:\n", performance_list)
         else:
             if model_feat[-1] == 'two_k_watt':
                 performance_list[model_nr - 1][0].append(mse_val_sec)
