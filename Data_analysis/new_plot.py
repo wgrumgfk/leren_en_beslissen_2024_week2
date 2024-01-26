@@ -176,15 +176,15 @@ def average_split_per_person(dataframe):
     return dataframe
 
 plt.figure(figsize=(10, 6))
-sns.scatterplot(x='calculated_distance', y='two_k_tijd_sec',  data=raw_df)
+sns.scatterplot(x ='days_until_2k', y ='two_k_tijd_sec',  data=raw_df)
 #sns.regplot(x="calculated_distance", y="two_k_tijd_sec", data=raw_df, scatter=False)
 # sns.regplot(x="wattage", y="2k_wattage", data=new_df)
-plt.title('Correlation between training wattage and 2k wattage per Rower')
-plt.xlabel('afstand')
-plt.ylabel('2k time')
+plt.title('Correlation between days until 2k test and 500 split time')
+plt.xlabel('days until 2k test')
+plt.ylabel('500 split time')
 
 # Set x-axis limits to 0 to 100
-
+plt.xlim(0, 100)
 
 # Commenting out the legend as it was mentioned in the previous discussion
 # plt.legend(title='zone')
