@@ -1,4 +1,5 @@
 from sklearn import tree
+import matplotlib.pyplot as plt
 import pandas as pd
 import numpy
 from sklearn.metrics import mean_squared_error
@@ -21,6 +22,11 @@ performance_dict = dict()
 
 for iter in range(1, 101):
     rand_seed = random.randint(0, 100000)
+
+    best_depth = None
+    min_val_mse = float('inf')
+    best_residuals = None
+    best_iteration = None
 
     # For every model calculate the val_mse. Store the model with best val_mse.
     # Also print the test_mse for this model.
@@ -59,6 +65,17 @@ for iter in range(1, 101):
         y_train = numpy.array([watt_to_pace(x)  for x in y_train])
         mse_train = mean_squared_error(y_train, y_train_pred)
         baseline_mse_train = mean_squared_error(numpy.array([watt_to_pace(baseline_prediction)  for _ in range(len(y_train))]), y_train)
+
+        if depth == 7:  # Assuming you are interested in depth 7
+            residuals_val_sec = y_val - y_val_pred
+            if mse_val < min_val_mse:
+                min_val_mse = mse_val
+                best_depth = depth
+                best_residuals = residuals_val_sec
+                best_iteration = iter
+        
+      
+
     
 
         if iter == 1:
@@ -74,6 +91,12 @@ for iter in range(1, 101):
         #coefficients = pd.DataFrame({'Feature': X.columns, 'Coefficient': linear_reg_model.coef_})
         #print(coefficients)
 
+if best_residuals is not None:
+    plt.hist(best_residuals, bins=20)
+    plt.title(f"Residuals (Validation Set) for the best model (Depth {best_depth}),Iteration {best_iteration}")
+    plt.xlabel("Residuals")
+    plt.ylabel("Percantage")
+    plt.show()
 print('\n-------------------------')
 print('Model training and predicting done.\n')
 print("Printing model performances for ", iter, " iterations...\n")
@@ -91,6 +114,9 @@ for k,v in performance_dict.items():
     print("MSE train           :", sum(v[2])/len(v[2]))
     print("Baseline MSE train  :", sum(v[3])/len(v[3]))
     print("\n")
+
+
+
 
 """
 # Print the best model and its mse's to screen.
