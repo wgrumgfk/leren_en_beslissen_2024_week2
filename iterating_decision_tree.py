@@ -75,9 +75,6 @@ for iter in range(1, 101):
                 best_iteration = iter
         
       
-
-    
-
         if iter == 1:
             performance_dict[depth] = [[mse_val], [baseline_mse_val], [mse_val], [baseline_mse_val], [len(model_feat_df), model_feat]]
         else:

@@ -1,4 +1,5 @@
 from sklearn.model_selection import train_test_split
+from sklearn.model_selection import cross_val_score, KFold
 from sklearn.linear_model import LinearRegression
 from sklearn.metrics import mean_squared_error
 import pandas as pd
@@ -12,6 +13,11 @@ from statistics import mean
 df = pd.read_csv('okeanos_processed.csv')
 
 all_cols = df.columns.to_list()
+
+# Initialize a dictionary to store the best cross-validated MSE for each model
+best_cv_scores = {f"Model_{i}": float('inf') for i in range(1, 13)}
+#number of K-folds for each
+num_folds = 6
 
 # Specify features for every model you wanna compare.
 # Always put to be predicted value as last element in list
@@ -57,12 +63,14 @@ for iter in range(1, iterations + 1):
 
         # Define features (X) and target variable (y)
         X = model_feat_df[model_feat[:-1]]
+       
         y = model_feat_df[model_feat[-1]]
 
         # Split the data into training, validation, and testing sets
         X_train, X_temp, y_train, y_temp = train_test_split(X, y, test_size=0.4, random_state=rand_seed)
         X_val, X_test, y_val, y_test = train_test_split(X_temp, y_temp, test_size=0.5, random_state=rand_seed)
 
+        #watt to pace in seconds
         def watt_to_pace(watt):
             if isinstance(watt, float):
                 return float(2000 * (float(2.8/float(watt))**(1/3)))
@@ -74,6 +82,29 @@ for iter in range(1, iterations + 1):
         # Make predictions on the validation set
         y_val_pred = linear_reg_model.predict(X_val)
         #print(y_val_pred)
+
+################################################################################################### Cross-validation
+        kf = KFold(n_splits=num_folds, shuffle=True, random_state=rand_seed)
+
+        # Convert the target variable to seconds for cross-validation
+        if model_feat[-1] == 'two_k_watt':
+            y_sec = numpy.array([watt_to_pace(x) for x in y])
+        else:
+            y_sec = y
+
+        # Calculate cross-validated scores on the converted target variable
+        cv_scores_sec = cross_val_score(linear_reg_model, X, y_sec, cv=kf, scoring='neg_mean_squared_error')
+        cv_scores_sec = cv_scores_sec * -1
+
+        # Compute the mean of the cross-validated scores
+        mean_cv_score_sec = numpy.mean(cv_scores_sec)
+
+        # Update the best cross-validated MSE for each model
+        model_name = f"Model_{model_nr}"
+        if mean_cv_score_sec < best_cv_scores[model_name]:
+            best_cv_scores[model_name] = mean_cv_score_sec
+###########################################################################################
+
 
         # validation MSE from wattage to seconds if predicted in watt
         if model_feat[-1] == 'two_k_watt':
@@ -206,62 +237,66 @@ for iter in range(1, iterations + 1):
 
         model_nr += 1
 
-print('\n-------------------------')
-print('Model training and predicting done.\n')
-print("Printing model performances for ", iter, " iterations...\n")
+# print('\n-------------------------')
+# print('Model training and predicting done.\n')
+# print("Printing model performances for ", iter, " iterations...\n")
 
-#print("KIJK: \n", performance_list[0][])
+# #print("KIJK: \n", performance_list[0][])
 
-for model_list in performance_list:
-    print('--------------------------')
-    print("Model nr : ", model_list[5])
-    print("Features : ", model_list[4][1][:-1])
-    print("Amount of rows remaining after dropna : ", model_list[4][0])
-    if model_list[4][1][-1] == 'two_k_watt':
-        print(f'The model predicts in wattage but the MSE is calculated in seconds')
-    else:
-        print(f'The model predicts in seconds and the MSE is also calculated in seconds')
-    print('\nVALIDATION set:')
-    print("MSE valid          :", sum(model_list[0])/len(model_list[0]))
-    print("MAE valid          :", sum(model_list[6][0])/len(model_list[6][0]))
-    for i in range(len(acc_thresholds)):
-        temp_acc = 0
-        for j in range(iterations):
-            temp_acc += model_list[7][j][i]
+# for model_list in performance_list:
+#     print('--------------------------')
+#     print("Model nr : ", model_list[5])
+#     print("Features : ", model_list[4][1][:-1])
+#     print("Amount of rows remaining after dropna : ", model_list[4][0])
+#     if model_list[4][1][-1] == 'two_k_watt':
+#         print(f'The model predicts in wattage but the MSE is calculated in seconds')
+#     else:
+#         print(f'The model predicts in seconds and the MSE is also calculated in seconds')
+#     print('\nVALIDATION set:')
+#     print("MSE valid          :", sum(model_list[0])/len(model_list[0]))
+#     print("MAE valid          :", sum(model_list[6][0])/len(model_list[6][0]))
+#     for i in range(len(acc_thresholds)):
+#         temp_acc = 0
+#         for j in range(iterations):
+#             temp_acc += model_list[7][j][i]
         
-        print("Accuracy valid within range ", acc_thresholds[i], " seconds: ", temp_acc/iterations)
+#         print("Accuracy valid within range ", acc_thresholds[i], " seconds: ", temp_acc/iterations)
     
-    print('\nBASELINE VALIDATION:')
-    print("Baseline MSE valid :", sum(model_list[1])/len(model_list[1]))
-    print("Baseline MAE valid :", sum(model_list[6][1])/len(model_list[6][1]))
-    for i in range(len(acc_thresholds)):
-        temp_acc = 0
-        for j in range(iterations):
-            temp_acc += model_list[8][j][i]
+#     print('\nBASELINE VALIDATION:')
+#     print("Baseline MSE valid :", sum(model_list[1])/len(model_list[1]))
+#     print("Baseline MAE valid :", sum(model_list[6][1])/len(model_list[6][1]))
+#     for i in range(len(acc_thresholds)):
+#         temp_acc = 0
+#         for j in range(iterations):
+#             temp_acc += model_list[8][j][i]
         
-        print("Accuracy baseline valid within range ", acc_thresholds[i], " seconds: ", temp_acc/iterations)
+#         print("Accuracy baseline valid within range ", acc_thresholds[i], " seconds: ", temp_acc/iterations)
 
-    print('\nTEST set:')
-    print("MSE test           :", sum(model_list[2])/len(model_list[2]))
-    print("MAE test           :", sum(model_list[6][2])/len(model_list[6][2]))
-    for i in range(len(acc_thresholds)):
-        temp_acc = 0
-        for j in range(iterations):
-            temp_acc += model_list[9][j][i]
+#     print('\nTEST set:')
+#     print("MSE test           :", sum(model_list[2])/len(model_list[2]))
+#     print("MAE test           :", sum(model_list[6][2])/len(model_list[6][2]))
+#     for i in range(len(acc_thresholds)):
+#         temp_acc = 0
+#         for j in range(iterations):
+#             temp_acc += model_list[9][j][i]
         
-        print("Accuracy test within range ", acc_thresholds[i], "seconds: ", temp_acc/iterations)
+#         print("Accuracy test within range ", acc_thresholds[i], "seconds: ", temp_acc/iterations)
 
-    print('\nBASELINE TEST:')
-    print("Baseline MSE test  :", sum(model_list[3])/len(model_list[3]))
-    print("Baseline MAE test  :", sum(model_list[6][3])/len(model_list[6][3]))
-    for i in range(len(acc_thresholds)):
-        temp_acc = 0
-        for j in range(iterations):
-            temp_acc += model_list[10][j][i]
+#     print('\nBASELINE TEST:')
+#     print("Baseline MSE test  :", sum(model_list[3])/len(model_list[3]))
+#     print("Baseline MAE test  :", sum(model_list[6][3])/len(model_list[6][3]))
+#     for i in range(len(acc_thresholds)):
+#         temp_acc = 0
+#         for j in range(iterations):
+#             temp_acc += model_list[10][j][i]
         
-        print("Accuracy baseline test within range ", acc_thresholds[i], "seconds: ", temp_acc/iterations)
+#         print("Accuracy baseline test within range ", acc_thresholds[i], "seconds: ", temp_acc/iterations)
     
-    print("\n")
+#     print("\n")
+
+
+for model_name, best_cv_score in best_cv_scores.items():
+    print(f"{model_name}: Best Cross-validated MSE = {best_cv_score}")
 
 
 """

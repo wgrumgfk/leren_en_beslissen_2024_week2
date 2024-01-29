@@ -298,7 +298,7 @@ if __name__ == "__main__":
 
     # Delete unnecessary columns
     # trainingstype dummy variables maken?
-    non_empty_df.drop(columns=['2k tijd', '500_split','rust', 'machine', 'two_k_datum', 'geslacht', 'gewichtsklasse', 'zone', 'datum','ploeg', 'naam', 'intervaltype', 'trainingype', 'spm', 'interval_nummer'], inplace=True)
+    non_empty_df.drop(columns=['2k tijd', '500_split','rust', 'machine', 'two_k_datum', 'geslacht', 'gewichtsklasse', 'zone', 'datum','ploeg', 'intervaltype', 'trainingype', 'spm', 'interval_nummer'], inplace=True)
 
     print('exported processed dataframe with new columns to okeanos_processed.csv')
 
