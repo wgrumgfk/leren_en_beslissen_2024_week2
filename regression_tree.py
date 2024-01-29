@@ -84,8 +84,8 @@ for iter in range(1, 1001):
     y_val_pred = numpy.array([watt_to_pace(x) for x in y_val_pred])
     y_val = numpy.vectorize(watt_to_pace)(y_val) 
 
-    threshold = 10
 
+    threshold = 5
     good = 0
     for i in range(len(y_val)):
         if abs(y_val[i] - y_val_pred[i]) < threshold:
