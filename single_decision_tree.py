@@ -36,7 +36,7 @@ X_val, X_test, y_val, y_test = train_test_split(X_temp, y_temp, test_size=0.5, r
 # REGRESSOR #################################################################################################
 if regressor == True:
     # Train
-    regr = DecisionTreeRegressor(max_depth=3)
+    regr = DecisionTreeRegressor(max_depth=5)
     regr = regr.fit(X_train, y_train)
 
     # Predict

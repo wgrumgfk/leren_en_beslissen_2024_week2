@@ -112,9 +112,6 @@ for k,v in performance_dict.items():
     print("Baseline MSE train  :", sum(v[3])/len(v[3]))
     print("\n")
 
-
-
-
 """
 # Print the best model and its mse's to screen.
 print("\nRESULTS:\nBest model nr: ", best_model_nr)
