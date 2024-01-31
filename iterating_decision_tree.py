@@ -66,7 +66,7 @@ for iter in range(1, 101):
         mse_train = mean_squared_error(y_train, y_train_pred)
         baseline_mse_train = mean_squared_error(numpy.array([watt_to_pace(baseline_prediction)  for _ in range(len(y_train))]), y_train)
 
-        if depth == 7:  # Assuming you are interested in depth 7
+        if depth == 5:  # Assuming you are interested in depth 7
             residuals_val_sec = y_val - y_val_pred
             if mse_val < min_val_mse:
                 min_val_mse = mse_val
@@ -90,9 +90,9 @@ for iter in range(1, 101):
 
 if best_residuals is not None:
     plt.hist(best_residuals, bins=20)
-    plt.title(f"Residuals (Validation Set) for the best model (Depth {best_depth}),Iteration {best_iteration}")
+    plt.title(f"Residuals (Validation Set) for the best model (Depth {best_depth})")
     plt.xlabel("Residuals")
-    plt.ylabel("Percantage")
+    plt.ylabel("Frequency")
     plt.show()
 print('\n-------------------------')
 print('Model training and predicting done.\n')

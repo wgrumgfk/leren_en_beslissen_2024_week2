@@ -1,4 +1,5 @@
 from sklearn.model_selection import train_test_split
+import matplotlib.pyplot as plt
 from sklearn.model_selection import cross_val_score, KFold
 from sklearn.linear_model import LinearRegression
 from sklearn.metrics import mean_squared_error
@@ -45,6 +46,10 @@ for iter in range(1, iterations + 1):
     #rand_seed = 7
     model_nr = 1
 
+    best_model_name = ""
+    best_model_residuals = None
+    best_model_mse = float('inf')
+
     print('------------------------------')
     print('Iteration: ', iter)
     print('Random seed is ', rand_seed)
@@ -83,27 +88,7 @@ for iter in range(1, iterations + 1):
         y_val_pred = linear_reg_model.predict(X_val)
         #print(y_val_pred)
 
-################################################################################################### Cross-validation
-        kf = KFold(n_splits=num_folds, shuffle=True, random_state=rand_seed)
-
-        # Convert the target variable to seconds for cross-validation
-        if model_feat[-1] == 'two_k_watt':
-            y_sec = numpy.array([watt_to_pace(x) for x in y])
-        else:
-            y_sec = y
-
-        # Calculate cross-validated scores on the converted target variable
-        cv_scores_sec = cross_val_score(linear_reg_model, X, y_sec, cv=kf, scoring='neg_mean_squared_error')
-        cv_scores_sec = cv_scores_sec * -1
-
-        # Compute the mean of the cross-validated scores
-        mean_cv_score_sec = numpy.mean(cv_scores_sec)
-
-        # Update the best cross-validated MSE for each model
-        model_name = f"Model_{model_nr}"
-        if mean_cv_score_sec < best_cv_scores[model_name]:
-            best_cv_scores[model_name] = mean_cv_score_sec
-###########################################################################################
+        
 
 
         # validation MSE from wattage to seconds if predicted in watt
@@ -230,12 +215,17 @@ for iter in range(1, iterations + 1):
                 performance_list[model_nr - 1][8].append(baseline_val_acc)
                 performance_list[model_nr - 1][9].append(test_acc)
                 performance_list[model_nr - 1][10].append(baseline_test_acc)
+        
 
-        # Print the coefficients of the model
-        #coefficients = pd.DataFrame({'Feature': X.columns, 'Coefficient': linear_reg_model.coef_})
-        #print(coefficients)
+model_feat_tuple = tuple(model_feat)
 
-        model_nr += 1
+# Check if the key exists in the dictionary
+if model_feat_tuple not in best_cv_scores or mse_val < best_cv_scores[model_feat_tuple]:
+    best_cv_scores[model_feat_tuple] = mse_val  # Update the best MSE
+    best_model_name = model_feat_tuple
+    best_model_residuals = y_val - y_val_pred
+    best_model_mse = mse_val
+
 
 # print('\n-------------------------')
 # print('Model training and predicting done.\n')
@@ -295,16 +285,18 @@ for iter in range(1, iterations + 1):
 #     print("\n")
 
 
-for model_name, best_cv_score in best_cv_scores.items():
-    print(f"{model_name}: Best Cross-validated MSE = {best_cv_score}")
+# for model_name, best_cv_score in best_cv_scores.items():
+#     print(f"{model_name}: Best Cross-validated MSE = {best_cv_score}")
 
 
-"""
+# Print the residuals of the best model
+print(f"Residuals of the Best Model ({best_model_name}) with the Lowest MSE:")
+print(best_model_residuals)
 
 
-    plt.hist(residuals_val_sec, bins=20)
-    plt.title("Histogram of Residuals (Validation Set)")
-    plt.xlabel("Residuals")
-    plt.ylabel("Frequency")
-    plt.show()
-"""
+# Plot histogram of residuals for the best model
+plt.hist(best_model_residuals, bins=20)
+plt.title(f"Histogram of Residuals for the Best Model")
+plt.xlabel("Residuals")
+plt.ylabel("Frequency")
+plt.show()
