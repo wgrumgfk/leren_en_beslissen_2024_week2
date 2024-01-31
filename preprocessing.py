@@ -227,7 +227,7 @@ if __name__ == "__main__":
     col_ED = non_empty_df.apply(lambda x: 1 if x.zone=='ED' else 0 , axis=1)
     non_empty_df.insert(9, "ED", col_ED, True)
     col_ED_plus = non_empty_df.apply(lambda x: 1 if x.zone=='ED+' else 0 , axis=1)
-    non_empty_df.insert(10, "ED+", col_ED, True)
+    non_empty_df.insert(10, "ED+", col_ED_plus, True)
 
     #Dummy categorical variables voor Interval_nummer
     # Replace 'interval_nummer' with the actual column name in your DataFrame
