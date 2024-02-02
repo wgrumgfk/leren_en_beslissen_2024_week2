@@ -156,28 +156,42 @@ def entry_to_seconds(entry):
 
 # load file
 
-csv_path ="/home/bardha/Documents/GitHub/leren_en_beslissen_2024_week2/okeanos_processed.csv"
+cwd = os.getcwd()
+csv_path = cwd + "/okeanos_processed.csv"
 raw_df = pd.read_csv(csv_path, delimiter=',', na_values=['', 'NA', 'N/A', 'NaN', 'nan'])
 
-df = raw_df 
+# df = raw_df[(raw_df['afstand'] == 0)]
+# print(df)
 
-
-csv_path = "/home/bardha/Documents/GitHub/leren_en_beslissen_2024_week2/okeanos_processed.csv"
-raw_df = pd.read_csv(csv_path, delimiter=',', na_values=['', 'NA', 'N/A', 'NaN', 'nan'])
-
-df = raw_df 
 def average_split_per_person(dataframe):
-    dataframe['tijd'] = df['500_split_watt'].apply(entry_to_seconds)
-    dataframe['average_speed'] = dataframe.groupby('naam')['tijd'].transform('mean')
+    dataframe['average_speed'] = dataframe.groupby('naam')['500_split_sec'].transform('mean')
     return dataframe
 
+# plt.figure(figsize=(10, 6))
+# sns.scatterplot(x ='calculated_distance', y ='500_split_sec',  data=df)
+# #sns.regplot(x="calculated_distance", y="two_k_tijd_sec", data=raw_df, scatter=False)
+# # sns.regplot(x="wattage", y="2k_wattage", data=new_df)
+# plt.xlabel('Distance training')
+# plt.ylabel('Split training')
+
+raw_df['mean_split'] = raw_df.groupby('aantal_intervallen')['500_split_sec'].transform('mean')
+raw_df = raw_df.drop_duplicates(subset='aantal_intervallen', keep='first')
+# raw_df = raw_df[(raw_df['days_until_2k'] < 150)]
+
+# plt.figure(figsize=(10, 6))
+# sns.scatterplot(x ='days_until_2k', y ='mean_split',  data=raw_df)
+# #sns.regplot(x="calculated_distance", y="two_k_tijd_sec", data=raw_df, scatter=False)
+# # sns.regplot(x="wattage", y="2k_wattage", data=new_df)
+# plt.xlabel('Days until test')
+# plt.ylabel('Split training')
+print(raw_df['rust_sec'])
 plt.figure(figsize=(10, 6))
-sns.scatterplot(y ='calculated_distance', x ='500_split_watt',  data=raw_df)
+sns.scatterplot(x ='aantal_intervallen', y ='mean_split',  data=raw_df)
 #sns.regplot(x="calculated_distance", y="two_k_tijd_sec", data=raw_df, scatter=False)
 # sns.regplot(x="wattage", y="2k_wattage", data=new_df)
-plt.title('Correlation between the calculated dstance of each training and the 500 split time')
-plt.xlabel('500_split_watt')
-plt.ylabel('calculated_distance')
+plt.xlabel('Number of intervals of training')
+plt.ylabel('Split training')
+
 
 
 

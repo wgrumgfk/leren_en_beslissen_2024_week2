@@ -78,6 +78,11 @@ def average_split_per_person(dataframe):
     dataframe['average_speed'] = dataframe.groupby('naam')['tijd'].transform('mean')
     return dataframe
 
+def average_split_per_person_and_zone(dataframe):
+    dataframe['tijd'] = df['500_split'].apply(entry_to_seconds)
+    dataframe['average_speed'] = dataframe.groupby(['naam', 'zone'])['tijd'].transform('mean')
+    return dataframe
+
 # load file
 cwd = os.getcwd()
 csv_path = cwd + "/okeanos.csv"
@@ -118,20 +123,22 @@ df['group'] = np.where((df['gewichtsklasse'] == 'Z') & (df['ervaring'] == 1), 'Z
                                           np.where((df['gewichtsklasse'] == 'Z') & (df['ervaring'] == 0), 'ZU', 'LE')))
 
 # only one entry per person with average
-df = average_split_per_person(df)
-df = df.drop_duplicates(subset='naam', keep='first')
+men = df[(df['geslacht'] == 'M')]
+women = df[(df['geslacht'] == 'V')]
 
-men_df = df[(df['geslacht'] == 'M')]
-women_df = df[(df['geslacht'] == 'V')]
+average = average_split_per_person(df)
+average = average.drop_duplicates(subset='naam', keep='first')
 
-filtered_df = df[(df['500_split_sec'] > 95)]
+average_men = average[(average['geslacht'] == 'M')]
+average_women = average[(average['geslacht'] == 'V')]
 
-men_filtered_df = men_df[(men_df['500_split_sec'] > 95)]
+filtered_df = average[(average['500_split_sec'] > 95)]
+
+average_men_filtered = average_men[(average_men['500_split_sec'] > 95)]
 
 # Scatter plot
 plt.figure(figsize=(10, 6))
-sns.scatterplot(x='500_split_sec', y='two_k_tijd_sec', hue='geslacht', data=df)
-# sns.regplot(x = "500_split_sec", y = "two_k_tijd_sec", data = filtered_df, scatter=False)
+sns.scatterplot(x='500_split_sec', y='two_k_tijd_sec', hue='geslacht', data=average)
 plt.xlabel('Split training')
 plt.ylabel('Split 2k test')
 
@@ -144,7 +151,7 @@ plt.show()
 
 # Scatter plot
 plt.figure(figsize=(10, 6))
-sns.scatterplot(x='500_split_sec', y='two_k_tijd_sec', hue='group', data=women_df)
+sns.scatterplot(x='500_split_sec', y='two_k_tijd_sec', hue='group', data=average_women)
 # sns.regplot(x = "500_split_sec", y = "two_k_tijd_sec", data = men_filtered_df, scatter=False)
 plt.xlabel('Split training')
 plt.ylabel('Split 2k test')
@@ -153,5 +160,23 @@ legend = plt.legend(title_fontsize=14, fontsize = 14, loc='lower right')
 new_labels = ['Light unexperienced', 'Heavy unexperienced', 'Light experienced', 'Heavy experienced']
 for text, label in zip(legend.get_texts(), new_labels):
     text.set_text(label)
+plt.grid(True)
+plt.show()
+
+new_men_df = average_split_per_person_and_zone(men)
+new_men_df = new_men_df.drop_duplicates(subset=['naam', 'zone'], keep='first')
+
+new_women_df = average_split_per_person_and_zone(women)
+new_women_df = new_women_df.drop_duplicates(subset=['naam', 'zone'], keep='first')
+
+plt.figure(figsize=(10, 6))
+sns.scatterplot(x='500_split_sec', y='two_k_tijd_sec', hue='zone', data=new_women_df)
+plt.xlabel('Split training')
+plt.ylabel('Split 2k test')
+
+legend = plt.legend(title_fontsize=14, fontsize = 14, loc='lower right')
+# new_labels = ['Light unexperienced', 'Heavy unexperienced', 'Light experienced', 'Heavy experienced']
+# for text, label in zip(legend.get_texts(), new_labels):
+#     text.set_text(label)
 plt.grid(True)
 plt.show()
