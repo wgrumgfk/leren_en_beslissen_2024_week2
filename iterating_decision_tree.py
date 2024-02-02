@@ -2,6 +2,7 @@ from sklearn import tree
 import matplotlib.pyplot as plt
 import pandas as pd
 import numpy
+from statistics import mean
 from sklearn.metrics import mean_squared_error
 from sklearn.model_selection import train_test_split
 from sklearn import tree
@@ -18,13 +19,14 @@ def watt_to_pace(watt):
         return float(2000 * (float(2.8/float(watt))**(1/3)))
     
 performance_dict = dict()
-
+mse_5 = []
 
 for iter in range(1, 101):
     rand_seed = random.randint(0, 100000)
 
     best_depth = None
     min_val_mse = float('inf')
+    min_test_mse = float('inf')
     best_residuals = None
     best_iteration = None
 
@@ -50,6 +52,7 @@ for iter in range(1, 101):
 
         # Predict
         y_val_pred = regr.predict(X_val)
+        y_test_pred = regr.predict(X_test)
         y_train_pred = regr.predict(X_train)
 
         baseline_prediction = sum(y_train)/len(y_train)
@@ -66,12 +69,26 @@ for iter in range(1, 101):
         mse_train = mean_squared_error(y_train, y_train_pred)
         baseline_mse_train = mean_squared_error(numpy.array([watt_to_pace(baseline_prediction)  for _ in range(len(y_train))]), y_train)
 
+<<<<<<< Updated upstream
         if depth == 5:  # Assuming you are interested in depth 7
             residuals_val_sec = y_val - y_val_pred
             if mse_val < min_val_mse:
                 min_val_mse = mse_val
+=======
+        # Evaluate test
+        y_test_pred = numpy.array([watt_to_pace(x) for x in y_test_pred])
+        y_test = numpy.array([watt_to_pace(x)  for x in y_test])
+        mse_test = mean_squared_error(y_test, y_test_pred)
+        baseline_mse_test = mean_squared_error(numpy.array([watt_to_pace(baseline_prediction) for _ in range(len(y_test))]), y_test)
+        
+        if depth == 5:  # Assuming you are interested in depth 7
+            mse_5.append(mse_test)
+            residuals_test_sec = y_test - y_test_pred
+            if mse_test < min_test_mse:
+                min_val_mse = mse_test
+>>>>>>> Stashed changes
                 best_depth = depth
-                best_residuals = residuals_val_sec
+                best_residuals = residuals_test_sec
                 best_iteration = iter
         
       
@@ -90,10 +107,16 @@ for iter in range(1, 101):
 
 if best_residuals is not None:
     plt.hist(best_residuals, bins=20)
+<<<<<<< Updated upstream
     plt.title(f"Residuals (Validation Set) for the best model (Depth {best_depth})")
+=======
+    plt.title(f"Residuals test set")
+>>>>>>> Stashed changes
     plt.xlabel("Residuals")
     plt.ylabel("Frequency")
     plt.show()
+
+print(mean(mse_5))
 print('\n-------------------------')
 print('Model training and predicting done.\n')
 print("Printing model performances for ", iter, " iterations...\n")

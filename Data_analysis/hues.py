@@ -100,15 +100,15 @@ df = non_empty_df
 filtered_df = df[(df['wattage'] < threshold) & (df['2k_wattage'] < threshold)]
 
 # only one entry per person with average
-new_df = average_split_per_person(filtered_df)
-new_df = new_df.drop_duplicates(subset='naam', keep='first')
+# new_df = average_split_per_person(filtered_df)
+# new_df = new_df.drop_duplicates(subset='naam', keep='first')
 
 
 
 # Scatter plot
 plt.figure(figsize=(10, 6))
-sns.scatterplot(x='wattage', y='2k_wattage', hue='zone', data=new_df)
-sns.regplot(x = "wattage", y = "2k_wattage", data = new_df, scatter=False)
+sns.scatterplot(x='wattage', y='2k_wattage', hue='zone', data=filtered_df)
+sns.regplot(x = "wattage", y = "2k_wattage", data = filtered_df, scatter=False)
 # sns.regplot(x = "wattage", y = "2k_wattage", data = new_df)
 plt.title('Correlation between training wattage and 2k wattage (Man)')
 plt.xlabel('training wattage')

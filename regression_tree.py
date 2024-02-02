@@ -22,10 +22,10 @@ wattage = True
 
 # Make sure all rows are complete
 df = pd.read_csv('okeanos_processed.csv')
-df.dropna(how = 'any', subset = ['days_until_2k', 'man', 'zwaar','AT','I','ID','ED','500_split_watt', 'ervaring', 'afstand', 'rust_sec', "aantal_intervallen", "calculated_distance", 'two_k_watt'], inplace=True)
+df.dropna(how = 'any', subset = ['days_until_2k', 'man', 'zwaar','AT','I','ID','ED','mean_500_per_training', 'ervaring', 'afstand', 'rust_sec', "aantal_intervallen", "calculated_distance", 'two_k_watt'], inplace=True)
 
 # Define features (X)
-feature_cols = ['days_until_2k', 'man', 'zwaar','AT','I','ID','ED','500_split_watt', 'ervaring', 'rust_sec', 'aantal_intervallen', 'calculated_distance', 'afstand']
+feature_cols = ['days_until_2k', 'man', 'zwaar','AT','I','ID','ED', 'mean_500_per_training','ervaring', 'rust_sec', 'aantal_intervallen', 'calculated_distance', 'afstand']
 X = df[feature_cols]
 
 if wattage == True:
