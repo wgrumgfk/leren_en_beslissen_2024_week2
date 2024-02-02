@@ -84,7 +84,7 @@ non_empty_df.insert(10, "wattage", col_500_split_watt, True)
 
 # Select all 2k_times entries and convert to seconds and insert new column into df
 col_two_k = non_empty_df.dropna(how='any', subset=('2k tijd')).loc[:,"2k tijd"]
-col_two_k_sec = col_two_k.apply(time_notation_to_sec)
+col_two_k_sec = col_two_k.apply(time_notation_to_sec) / 4
 non_empty_df.insert(1, "two_k_tijd_sec", col_two_k_sec, True)
 
 # Add watt column for 2k time
@@ -96,22 +96,21 @@ non_empty_df.insert(1, "2k_wattage", col_two_k_watt, True)
 threshold = 400
 
 df = non_empty_df
-# only keep data below threshold
-filtered_df = df[(df['wattage'] < threshold) & (df['2k_wattage'] < threshold)]
 
 # only one entry per person with average
-new_df = average_split_per_person(filtered_df)
-new_df = new_df.drop_duplicates(subset='naam', keep='first')
+df = average_split_per_person(df)
+df = df.drop_duplicates(subset='naam', keep='first')
+
+filtered_df = df[(df['wattage'] < 400) & (df['2k_wattage'] < 450)]
 
 # Scatter plot
 plt.figure(figsize=(10, 6))
-sns.scatterplot(x='wattage', y='2k_wattage', hue='zone', data=new_df)
-sns.regplot(x = "wattage", y = "2k_wattage", data = new_df, scatter=False)
+sns.scatterplot(x='500_split_sec', y='two_k_tijd_sec', hue='geslacht', data=df)
+sns.regplot(x = "500_split_sec", y = "two_k_tijd_sec", data = filtered_df, scatter=False)
 # sns.regplot(x = "wattage", y = "2k_wattage", data = new_df)
-plt.title('Correlation between training wattage and 2k wattage (Man)')
-plt.xlabel('training wattage')
-plt.ylabel('2k wattage')
+plt.xlabel('Split training')
+plt.ylabel('Split 2k test')
 
-plt.legend(title='zone')
+plt.legend(title='Sex')
 plt.grid(True)
 plt.show()

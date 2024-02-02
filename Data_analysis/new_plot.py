@@ -160,10 +160,6 @@ csv_path ="/home/bardha/Documents/GitHub/leren_en_beslissen_2024_week2/okeanos_p
 raw_df = pd.read_csv(csv_path, delimiter=',', na_values=['', 'NA', 'N/A', 'NaN', 'nan'])
 
 df = raw_df 
-def average_split_per_person(dataframe):
-    dataframe['tijd'] = df['500_split'].apply(entry_to_seconds)
-    dataframe['average_speed'] = dataframe.groupby('naam')['tijd'].transform('mean')
-    return dataframe
 
 
 csv_path = "/home/bardha/Documents/GitHub/leren_en_beslissen_2024_week2/okeanos_processed.csv"
@@ -171,19 +167,18 @@ raw_df = pd.read_csv(csv_path, delimiter=',', na_values=['', 'NA', 'N/A', 'NaN',
 
 df = raw_df 
 def average_split_per_person(dataframe):
-    dataframe['tijd'] = df['500_split'].apply(entry_to_seconds)
+    dataframe['tijd'] = df['500_split_watt'].apply(entry_to_seconds)
     dataframe['average_speed'] = dataframe.groupby('naam')['tijd'].transform('mean')
     return dataframe
 
 plt.figure(figsize=(10, 6))
-sns.scatterplot(x='calculated_distance', y='two_k_tijd_sec',  data=raw_df)
+sns.scatterplot(y ='calculated_distance', x ='500_split_watt',  data=raw_df)
 #sns.regplot(x="calculated_distance", y="two_k_tijd_sec", data=raw_df, scatter=False)
 # sns.regplot(x="wattage", y="2k_wattage", data=new_df)
-plt.title('Correlation between training wattage and 2k wattage per Rower')
-plt.xlabel('afstand')
-plt.ylabel('2k time')
+plt.title('Correlation between the calculated dstance of each training and the 500 split time')
+plt.xlabel('500_split_watt')
+plt.ylabel('calculated_distance')
 
-# Set x-axis limits to 0 to 100
 
 
 # Commenting out the legend as it was mentioned in the previous discussion

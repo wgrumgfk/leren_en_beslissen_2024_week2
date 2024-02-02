@@ -1,4 +1,5 @@
 from sklearn.model_selection import train_test_split
+from sklearn.model_selection import cross_val_score, KFold
 from sklearn.linear_model import LinearRegression
 from sklearn.metrics import mean_squared_error
 from sklearn.metrics import mean_absolute_error, r2_score
@@ -15,6 +16,14 @@ from statistics import mean
 df = pd.read_csv('okeanos_processed.csv')
 
 all_cols = df.columns.to_list()
+
+num_folds = 5
+
+################################################################################# Defenitions
+""" This function turns watagge of 2000 m into seconds"""
+def watt_to_pace(watt):
+    if isinstance(watt, float):
+        return float(2000 * (float(2.8/float(watt))**(1/3)))
 
 # Specify features for every model you wanna compare.
 # Always put to be predicted value as last element in list
@@ -41,23 +50,40 @@ for model_feat in [model_feat1, model_feat2, model_feat3]:
     print("\nFeatures:\n", model_feat)
     print('\n\nDeze specifieke subset van kolommen heeft ', len(model_feat_df), " rijen waarbij alle kolommen zijn ingevuld.\n")
 
+
     # Split the data into training, validation, and testing sets
     X_train, X_temp, y_train, y_temp = train_test_split(X, y, test_size=0.4, random_state=rand_seed)
     X_val, X_test, y_val, y_test = train_test_split(X_temp, y_temp, test_size=0.5, random_state=rand_seed)
 
+
+########################################################################################################################## Use KFold cross-validation
+    kf = KFold(n_splits=num_folds, shuffle=True, random_state=rand_seed)
     
-    def watt_to_pace(watt):
-        if isinstance(watt, float):
-            return float(2000 * (float(2.8/float(watt))**(1/3)))
 
-
+########################################################################################################################## linear model 
     # Create and train the Multiple Linear Regression model
     linear_reg_model = LinearRegression()
     linear_reg_model.fit(X_train, y_train)
 
     # Make predictions on the validation set
     y_val_pred = linear_reg_model.predict(X_val)
-     
+######################################################################################################################### cross-validation
+    # Convert the target variable to seconds for cross-validation
+    if model_feat[-1] == 'two_k_watt':
+        y_sec = numpy.array([watt_to_pace(x) for x in y])
+    else:
+        y_sec = y
+
+    # Calculate cross-validated scores on the converted target variable
+    cv_scores_sec = cross_val_score(linear_reg_model, X, y_sec, cv=kf, scoring='neg_mean_squared_error')
+    cv_scores_sec = cv_scores_sec * -1
+
+    # Compute the mean of the cross-validated scores
+    mean_cv_score_sec = numpy.mean(cv_scores_sec)
+######################################################################################################################### printing the calculated cross validation scores
+    print("\n\nModel nr. ", model_nr)
+    print("Cross-validated MSE: ", mean_cv_score_sec)
+##############################################################################################################
     # validation from wattage to seconds
     if model_feat[-1] == 'two_k_watt':
         y_val_pred_sec = numpy.array([watt_to_pace(x) for x in y_val_pred])
@@ -119,10 +145,14 @@ for model_feat in [model_feat1, model_feat2, model_feat3]:
         print(f'Mean Squared Error on Test Set: {mse_test}')
         print(f'Baseline MSE on Test Set      : {baseline_mse_test} \n')
 
-
+    ###################residual analasys
     residuals_val_sec = y_val_sec - y_val_pred_sec
     residuals_test_sec = y_test - y_test_pred
-########################## Residual analysis
+    #####################
+
+
+
+########################## acuraccy of model 
     threshold = 10
     ACC = []
 
@@ -140,27 +170,14 @@ for model_feat in [model_feat1, model_feat2, model_feat3]:
     coefficients = pd.DataFrame({'Feature': X.columns, 'Coefficient': linear_reg_model.coef_})
     print(coefficients)
 
-    # #Residual Analysis
-    # # Scatter plot of residuals against predicted values
-
-    # plt.scatter(y_val_pred_sec, residuals_val_sec)
-    # plt.title("Residuals vs. Fitted Values (Validation Set)")
-    # plt.xlabel("Fitted Values")
-    # plt.ylabel("Residuals")
-    # plt.show()
-
-    # Histogram of residuals
+  
+########################### Histogram of residuals
     plt.hist(residuals_val_sec, bins=20)
     plt.title("Histogram of Residuals (Validation Set)")
     plt.xlabel("Residuals")
     plt.ylabel("Frequency")
     plt.show()
-
-    # # Q-Q plot of residuals
-    # sm.qqplot(residuals_val_sec, line='45')
-    # plt.title("Q-Q Plot of Residuals (Validation Set)")
-    # plt.show()
-
+############################
     model_nr += 1
 
 print('\n-------------------------')

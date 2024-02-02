@@ -275,7 +275,7 @@ if __name__ == "__main__":
     "4x500/5'r", "3x3000/5'r", "3x15'/3'r", "8x3'/3'r", "7x3'/3'r", "2x19'/3'r",
     "2x3000/5'r", "6x750/5'r", "2x2000/5'r", '1000', "3x8'/5'r", '1500m+750m',
     "3x12'/5'r", "2x6x1'/1'r", "2x7x1'/1'r", "3x11'", "6x6'", "3x13'", "5x8'", "20'",
-    "3x2000m/4'r", "3x10'/4'r", "3x1000m/3'r", "8x3'/2'r", "6x750/3'r",
+    "3x2000m/4'r", "3x10'/4s'r", "3x1000m/3'r", "8x3'/2'r", "6x750/3'r",
     "3x7x1'/1'r", "3x1500/5'r", "4x8'/5'r", '6000', "2x10'/5'r", "2x4x20''/40''r",
     "1x20'", "3x5x1'/1'r", "6x5'/2'r", "7x3'/2'r", "3x2000/5'r" ,"4x4x40''/40''r",
     "9x3'/2'r", "3x8x1'/1'r", "5x5'/3'r", "5x7'/3'r", "5x9'/3'r", "3x1000/3'r",
@@ -298,7 +298,7 @@ if __name__ == "__main__":
 
     # Delete unnecessary columns
     # trainingstype dummy variables maken?
-    non_empty_df.drop(columns=['2k tijd', '500_split','rust', 'machine', 'two_k_datum','datum', 'geslacht', 'gewichtsklasse', 'ploeg', 'naam', 'intervaltype', 'trainingype', 'spm', 'zone', 'interval_nummer'], inplace=True)
+    non_empty_df.drop(columns=['2k tijd', '500_split','rust', 'machine', 'two_k_datum', 'geslacht', 'gewichtsklasse', 'zone', 'datum','ploeg', 'intervaltype', 'trainingype', 'spm', 'interval_nummer'], inplace=True)
 
     print('exported processed dataframe with new columns to okeanos_processed.csv')
 

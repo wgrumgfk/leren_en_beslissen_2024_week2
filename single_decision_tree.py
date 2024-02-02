@@ -18,10 +18,10 @@ def watt_to_pace(watt):
 
 # Make sure all rows are complete
 df = pd.read_csv('okeanos_processed.csv')
-df.dropna(how = 'any', subset = ['days_until_2k', 'man', 'zwaar','AT','I','ID','ED','500_split_sec','interval_afstand', 'ervaring', 'rust_sec', 'two_k_tijd_sec', 'two_k_watt'], inplace=True)
+df.dropna(how = 'any', subset =  ['days_until_2k', 'man', 'zwaar','AT','I','ID','ED','500_split_watt', 'ervaring', 'rust_sec', 'aantal_intervallen', 'calculated_distance', 'afstand', 'two_k_watt'], inplace=True)
 
 # Define features (X)
-feature_cols = ['days_until_2k', 'man', 'zwaar','AT','I','ID','ED','500_split_sec','interval_afstand', 'ervaring', 'rust_sec']
+feature_cols = ['days_until_2k', 'man', 'zwaar','AT','I','ID','ED','500_split_watt', 'ervaring', 'rust_sec', 'aantal_intervallen', 'calculated_distance', 'afstand']
 X = df[feature_cols]
 
 if wattage == True:
@@ -36,7 +36,7 @@ X_val, X_test, y_val, y_test = train_test_split(X_temp, y_temp, test_size=0.5, r
 # REGRESSOR #################################################################################################
 if regressor == True:
     # Train
-    regr = DecisionTreeRegressor(max_depth=3)
+    regr = DecisionTreeRegressor(max_depth=5)
     regr = regr.fit(X_train, y_train)
 
     # Predict
@@ -91,7 +91,7 @@ if regressor == False:
     print("MSE val class:", mse_test)
 
 
-fig = plt.figure(figsize=(25,20))
+fig = plt.figure(figsize=(50,15))
 _ = tree.plot_tree(regr, 
                    feature_names= feature_cols,  
                 #    class_names=df.target_names,

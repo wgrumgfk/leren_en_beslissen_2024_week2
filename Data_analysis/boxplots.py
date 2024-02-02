@@ -1,5 +1,6 @@
 import pandas as pd
 import os
+import numpy as np
 import matplotlib.pyplot as plt
 import statistics
 # Dataframe inladen voor Frédérique
@@ -88,9 +89,12 @@ filtered_df.loc[:, 'rate_difference'] = (
 )
 
 # Add difference column to dataframe
-filtered_df.loc[:, 'difference'] = (
-    filtered_df['wattage'] - filtered_df['2k_wattage']
-)
+# filtered_df.loc[:, 'difference'] = (
+#     filtered_df['wattage'] - filtered_df['2k_wattage']
+# )
+
+csv_path = r"okeanos_processed.csv"
+df = pd.read_csv(csv_path)
 
 def improvement_by_feature_and_person(filtered_df, feature):
     unique_values = filtered_df[feature].unique()
@@ -99,16 +103,16 @@ def improvement_by_feature_and_person(filtered_df, feature):
     data = []
 
     for value in unique_values:
-        men = filtered_df.loc[(df[feature] == value)]
+        men = filtered_df.loc[(filtered_df[feature] == value)]
         unique_men = men.naam.drop_duplicates().tolist()
         men_df = filtered_df[filtered_df['naam'].isin(unique_men)]
-        men_improvement = men_df['difference'].tolist()
+        men_improvement = men_df['500_split_sec'].tolist()
         data.append(men_improvement)
-
-    plt.boxplot(data, labels=unique_values, notch=None, vert=None, patch_artist=None, widths=None)
-    plt.xlabel(feature)
-    plt.ylabel('Wattage improvement 500m split training to 2k test')
-    plt.title('Improvement by Zone')
+    
+    plt.boxplot(data, labels=['Experienced', 'Unexperienced'])
+    plt.xlabel('Experience')
+    plt.ylabel('Wattage during training')
+    plt.title('Training performance by experience')
     plt.show()
 
-improvement_by_feature_and_person(filtered_df, 'zone')
+improvement_by_feature_and_person(filtered_df, 'ervaring')
