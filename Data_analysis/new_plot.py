@@ -174,9 +174,16 @@ def average_split_per_person(dataframe):
 # plt.xlabel('Distance training')
 # plt.ylabel('Split training')
 
-raw_df['mean_split'] = raw_df.groupby('aantal_intervallen')['500_split_sec'].transform('mean')
-raw_df = raw_df.drop_duplicates(subset='aantal_intervallen', keep='first')
+# raw_df['mean_split'] = raw_df.groupby('aantal_intervallen')['500_split_sec'].transform('mean')
+# raw_df = raw_df.drop_duplicates(subset='aantal_intervallen', keep='first')
+# print(raw_df['aantal_intervallen'])
+# print(raw_df['mean_split'])
 # raw_df = raw_df[(raw_df['days_until_2k'] < 150)]
+
+raw_df['meann_split'] = raw_df.groupby('rust_sec')['500_split_sec'].transform('mean')
+raw_df = raw_df.drop_duplicates(subset='rust_sec', keep='first')
+print(raw_df['rust_sec'])
+print(raw_df['meann_split'])
 
 # plt.figure(figsize=(10, 6))
 # sns.scatterplot(x ='days_until_2k', y ='mean_split',  data=raw_df)
@@ -184,19 +191,33 @@ raw_df = raw_df.drop_duplicates(subset='aantal_intervallen', keep='first')
 # # sns.regplot(x="wattage", y="2k_wattage", data=new_df)
 # plt.xlabel('Days until test')
 # plt.ylabel('Split training')
-print(raw_df['rust_sec'])
-plt.figure(figsize=(10, 6))
-sns.scatterplot(x ='aantal_intervallen', y ='mean_split',  data=raw_df)
-#sns.regplot(x="calculated_distance", y="two_k_tijd_sec", data=raw_df, scatter=False)
-# sns.regplot(x="wattage", y="2k_wattage", data=new_df)
-plt.xlabel('Number of intervals of training')
+
+# plt.figure(figsize=(10, 6))
+# sns.scatterplot(x ='aantal_intervallen', y ='mean_split',  data=raw_df)
+# #sns.regplot(x="calculated_distance", y="two_k_tijd_sec", data=raw_df, scatter=False)
+# # sns.regplot(x="wattage", y="2k_wattage", data=new_df)
+# plt.xlabel('Number of intervals of training')
+# plt.ylabel('Split training')
+
+# plt.grid(True)
+# plt.show()
+
+
+# x_axis = [1, 2, 3, 4, 5, 6, 7, 8, 9]
+# y_axis = [112.493, 110.773, 117.12, 112.20, 119.50, 109.74, 114.45, 109.83, 114.95]
+
+# plt.bar(x_axis, y_axis)
+# plt.xlabel('Number of intervals')
+# plt.ylabel('Split training')
+# plt.ylim(100, 120)
+# plt.show()
+
+x_axis = [60, 120, 180, 240, 300, 480]
+y_axis = [108, 112, 117.42, 124.4, 115.18, 119.54]
+
+plt.bar(x_axis, y_axis, width = 30)
+plt.xlabel('Rest between intervals (seconds)')
 plt.ylabel('Split training')
-
-
-
-
-# Commenting out the legend as it was mentioned in the previous discussion
-# plt.legend(title='zone')
-
-plt.grid(True)
+plt.ylim(100, 130)
 plt.show()
+

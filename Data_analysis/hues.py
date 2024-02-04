@@ -71,7 +71,7 @@ def split_500_to_watt(split):
 
 # Calculate watt from 2k time in seconds.
 def split_2k_to_watt(split):
-    return split_500_to_watt(float(split / 4))
+    return split_500_to_watt(float(split))
 
 def average_split_per_person(dataframe):
     dataframe['tijd'] = df['500_split'].apply(entry_to_seconds)
@@ -82,6 +82,12 @@ def average_split_per_person_and_zone(dataframe):
     dataframe['tijd'] = df['500_split'].apply(entry_to_seconds)
     dataframe['average_speed'] = dataframe.groupby(['naam', 'zone'])['tijd'].transform('mean')
     return dataframe
+
+def average_split_per_person_and_type(dataframe):
+    dataframe['tijd'] = df['500_split'].apply(entry_to_seconds)
+    dataframe['average_speed'] = dataframe.groupby(['naam', 'intervaltype'])['tijd'].transform('mean')
+    return dataframe
+
 
 # load file
 cwd = os.getcwd()
@@ -136,47 +142,79 @@ filtered_df = average[(average['500_split_sec'] > 95)]
 
 average_men_filtered = average_men[(average_men['500_split_sec'] > 95)]
 
-# Scatter plot
-plt.figure(figsize=(10, 6))
-sns.scatterplot(x='500_split_sec', y='two_k_tijd_sec', hue='geslacht', data=average)
-plt.xlabel('Split training')
-plt.ylabel('Split 2k test')
+correlation = df['500_split_sec'].corr(df['two_k_tijd_sec'])
+print(f'Correlation coefficient (under threshold): {correlation}')
 
-legend = plt.legend(title='Gender', title_fontsize=14, fontsize = 14)
-new_labels = ['M', 'F']
-for text, label in zip(legend.get_texts(), new_labels):
-    text.set_text(label)
-plt.grid(True)
-plt.show()
+# # Scatter plot
+# plt.figure(figsize=(10, 6))
+# sns.scatterplot(x='500_split_sec', y='two_k_tijd_sec', hue='geslacht', data=average)
+# plt.xlabel('Split training')
+# plt.ylabel('Split 2k test')
 
-# Scatter plot
-plt.figure(figsize=(10, 6))
-sns.scatterplot(x='500_split_sec', y='two_k_tijd_sec', hue='group', data=average_women)
-# sns.regplot(x = "500_split_sec", y = "two_k_tijd_sec", data = men_filtered_df, scatter=False)
-plt.xlabel('Split training')
-plt.ylabel('Split 2k test')
-
-legend = plt.legend(title_fontsize=14, fontsize = 14, loc='lower right')
-new_labels = ['Light unexperienced', 'Heavy unexperienced', 'Light experienced', 'Heavy experienced']
-for text, label in zip(legend.get_texts(), new_labels):
-    text.set_text(label)
-plt.grid(True)
-plt.show()
-
-new_men_df = average_split_per_person_and_zone(men)
-new_men_df = new_men_df.drop_duplicates(subset=['naam', 'zone'], keep='first')
-
-new_women_df = average_split_per_person_and_zone(women)
-new_women_df = new_women_df.drop_duplicates(subset=['naam', 'zone'], keep='first')
-
-plt.figure(figsize=(10, 6))
-sns.scatterplot(x='500_split_sec', y='two_k_tijd_sec', hue='zone', data=new_women_df)
-plt.xlabel('Split training')
-plt.ylabel('Split 2k test')
-
-legend = plt.legend(title_fontsize=14, fontsize = 14, loc='lower right')
-# new_labels = ['Light unexperienced', 'Heavy unexperienced', 'Light experienced', 'Heavy experienced']
+# legend = plt.legend(title='Gender', title_fontsize=14, fontsize = 14)
+# new_labels = ['M', 'F']
 # for text, label in zip(legend.get_texts(), new_labels):
 #     text.set_text(label)
-plt.grid(True)
-plt.show()
+# plt.grid(True)
+# plt.show()
+
+# # Scatter plot
+# plt.figure(figsize=(10, 6))
+# palette = {'LU': '#1f77b4', 'ZU': '#ff7f0e', 'LE': '#2ca02c', 'ZE': '#d62728'}
+# sns.scatterplot(x='500_split_sec', y='two_k_tijd_sec', hue='group', data=average_women, palette = palette)
+# # sns.regplot(x = "500_split_sec", y = "two_k_tijd_sec", data = men_filtered_df, scatter=False)
+# plt.xlabel('Split training')
+# plt.ylabel('Split 2k test')
+
+# legend = plt.legend(title_fontsize=14, fontsize = 14, loc='lower right')
+# new_labels = ['Light inexperienced', 'Heavy inexperienced', 'Light experienced', 'Heavy experienced']
+# for text, label in zip(legend.get_texts(), new_labels):
+#     text.set_text(label)
+# plt.grid(True)
+# plt.show()
+
+# new_men_df = average_split_per_person_and_zone(men)
+# new_men_df = new_men_df.drop_duplicates(subset=['naam', 'zone'], keep='first')
+
+# new_women_df = average_split_per_person_and_zone(women)
+# new_women_df = new_women_df.drop_duplicates(subset=['naam', 'zone'], keep='first')
+
+# plt.figure(figsize=(10, 6))
+# # palette = {'I': '#1f77b4', 'AT': '#ff7f0e', 'ED': '#2ca02c', 'ED+': '#d62728', 'ID': '#9467bd'}
+# sns.scatterplot(x='500_split_sec', y='two_k_tijd_sec', hue='zone', data=new_women_df, palette='tab10')
+# plt.xlabel('Split training')
+# plt.ylabel('Split 2k test')
+
+# legend = plt.legend(title_fontsize=14, fontsize = 14, loc='lower right')
+# # new_labels = ['Light unexperienced', 'Heavy unexperienced', 'Light experienced', 'Heavy experienced']
+# # for text, label in zip(legend.get_texts(), new_labels):
+# #     text.set_text(label)
+# plt.grid(True)
+# plt.show()
+
+
+# df['intervaltype'].str.strip()
+
+# average_type = average_split_per_person_and_type(df)
+# average_type = average.drop_duplicates(subset='naam', keep='first')
+
+# plt.figure(figsize=(10, 6))
+# sns.scatterplot(x='500_split_sec', y='two_k_tijd_sec', hue='intervaltype', data=average_type)
+# plt.xlabel('Split training')
+# plt.ylabel('Split 2k test')
+
+# legend = plt.legend(title='Training type', title_fontsize=14, fontsize = 14)
+# new_labels = ['Time', 'Distance']
+# for text, label in zip(legend.get_texts(), new_labels):
+#     text.set_text(label)
+# plt.grid(True)
+# plt.show()
+
+# # x_axis = [1, 2, 3, 4, 5, 6, 7, 8, 9]
+# # y_axis = [112.493, 110.773, 117.12, 112.20, 119.50, 109.74, 114.45, 109.83, 114.95]
+
+# # plt.bar(x_axis, y_axis)
+# # plt.xlabel('Number of intervals')
+# # plt.ylabel('Split training')
+# # plt.ylim(100, 120)
+# # plt.show()
